@@ -1,0 +1,59 @@
+<nav class="navbar navbar-expand-sm navbar-light bg-light" style="z-index: 100;">
+
+    <a class="navbar-brand" href="#">Maximum Coverage</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        
+        <button type="button" class="btn btn-outline-primary btn-sm" 
+          (click)="clear_clickHandler()">Clear
+        </button>
+
+        <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Circles</span>
+            </div>
+            <select class="custom-select" #circles_total (change)="circles_total_changeHandler(circles_total.value)">
+                <option value="1" [selected]="circlesTotal === 1">01</option>
+                <option value="2" [selected]="circlesTotal === 2">02</option>
+                <option value="3" [selected]="circlesTotal === 3">03</option>
+                <option value="4" [selected]="circlesTotal === 4">04</option>
+                <option value="5" [selected]="circlesTotal === 5">05</option>
+                <option value="6" [selected]="circlesTotal === 6">06</option>
+              </select>
+        </div>
+    
+        <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Circle Size</span>
+            </div>
+            <select class="custom-select" #circles_size  (change)="circles_size_changeHandler(circles_size.value)">
+                <option value="5" [selected]="circlesSize === 5">5</option>
+                <option value="10" [selected]="circlesSize === 10">10</option>
+                <option value="15" [selected]="circlesSize === 15">15</option>
+                <option value="20" [selected]="circlesSize === 20">20</option>
+                <option value="25" [selected]="circlesSize === 25">25</option>
+                <option value="30" [selected]="circlesSize === 30">30</option>
+              </select>
+        </div>
+
+        <button type="button" class="btn btn-outline-primary btn-sm" 
+          (click)="populate_clickHandler()">Initial Population
+        </button>
+
+        <button type="button" class="btn btn-outline-primary btn-sm" 
+          (click)="start_ga_clickHandler()">Start GA
+        </button>
+
+    </div>
+
+    
+
+    
+
+    
+
+    
+</nav> 
