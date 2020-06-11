@@ -44,7 +44,7 @@ export class FunctionService {
       this.get_points_covered_in_circle( circleID );
     }
     
-
+    this.MS.sendMessage( "circle_popupation:"+initialPopulation );
   }
 
   
@@ -86,6 +86,7 @@ export class FunctionService {
     }
 
     this.MS.points_in_polygon = points_in_polygon;
+    this.MS.sendMessage('points_in_polygon');
  
   }
 

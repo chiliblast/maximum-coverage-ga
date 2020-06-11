@@ -16,9 +16,15 @@ export class FooterComponent {
   constructor(private engServ: EngineService, private MS: MessageService, private FS: FunctionService) {
     // subscribe to component messages
     this.subscription = this.MS.getMessage().subscribe(message => {
-          
-      if (message == '') {
-        
+
+      let msg:string = message.split(":")[0];
+      let val:string = message.split(":")[1];
+      
+      if (message == 'points_in_polygon') {
+        document.getElementById('points_in_polygon').innerHTML = this.MS.points_in_polygon.length.toString();
+      }
+      if (msg == 'circle_popupation') {
+        document.getElementById('circle_popupation').innerHTML = val;
       }
 
     });
