@@ -52,7 +52,7 @@ export class NavbarComponent {
   }
 
   start_ga_clickHandler() {
-    //this.FS.ga_start(); 
+    this.MS.sendMessage( "start_ga_click" );
   }
 
   

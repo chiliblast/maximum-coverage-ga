@@ -2,39 +2,19 @@
 import { Injectable } from '@angular/core';
 import { EngineService } from '../engine/engine.service';
 import { MessageService } from './message.service';
-import { Vector3, MathUtils, Line } from 'three';
+import { Vector3, MathUtils } from 'three';
 import { Circle } from '../engine/circle';
 
-//import * as Genetic from 'genetic-js';
-import {
-  createEncodeFunctionOfBase,
-  FitnessFunctionObjective,
-  GeneticAlgorithm,
-  LinearGeneticAlgorithm,
-} from 'genetically';
- 
+
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class FunctionService {
 
-
-
   constructor(private engServ: EngineService, private MS: MessageService) {
-
   }
-
-  /*ga_start() {
-    
-    //var genetic = Genetic.create();
-    const gaLinear = LinearGeneticAlgorithm();
-gaLinear.run();
-gaLinear.display();
-     
-
-console.log(gaLinear)
-  }*/
 
   populate_circles( circle:Circle ) {
 
