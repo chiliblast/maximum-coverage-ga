@@ -57,6 +57,7 @@ export class GeneticService {
         genetic.select1 = Genetic.Select1.Tournament2;
         genetic.select2 = Genetic.Select2.Tournament2;
 
+        //Called to create an individual, can be of any type (int, float, string, array, object)
         genetic.seed = function():any {
 
           let  individual:any;
@@ -64,6 +65,7 @@ export class GeneticService {
           return individual;
         };
 
+        //Computes a fitness score for an individual
         genetic.fitness = function( individual ):number {
           
           let  fitness:number;
@@ -71,6 +73,7 @@ export class GeneticService {
           return fitness;
         };
 
+        //Called when an individual has been selected for mutation
         genetic.mutate = function( individual ):any {
           
           let  _individual:any;
@@ -78,6 +81,7 @@ export class GeneticService {
           return _individual;          
         };
 
+        //Called when two individuals are selected for mating. Two children should always returned
         genetic.crossover = function( mother, father ):any {
 
           let son:any;
@@ -86,12 +90,14 @@ export class GeneticService {
           return [ son, daughter ];     
         };
 
+        //Called for each generation. Return false to terminate end algorithm (ie- if goal state is reached)
         genetic.generation = function( pop, generation, stats ):boolean {
 
            
           return false;
         };
 
+        //Runs in the calling context. All functions other than this one are run in a web worker.
         genetic.notification = function( pop, generation, stats, isFinished ) {
 
 
