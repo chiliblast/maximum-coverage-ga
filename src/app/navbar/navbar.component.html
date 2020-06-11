@@ -1,13 +1,12 @@
-<nav class="navbar navbar-expand-sm navbar-light bg-light" style="z-index: 100;">
 
-    <a class="navbar-brand" href="#">Maximum Coverage</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        
-        <button type="button" class="btn btn-outline-primary btn-sm" 
+<nav ngxNavbarDynamicExpand class="navbar-light bg-light">
+  Maximum Coverage
+  <button class="navbar-toggler" type="button" (click)="collapse.toggle()" >
+    ....
+  </button>
+  <ngx-navbar-collapse #collapse="ngxNavbarCollapse">
+    
+    <button type="button" class="btn btn-outline-primary btn-sm" 
           (click)="clear_clickHandler()">Clear
         </button>
 
@@ -46,14 +45,6 @@
         <button type="button" class="btn btn-outline-primary btn-sm" 
           (click)="start_ga_clickHandler()">Start GA
         </button>
-
-    </div>
-
-    
-
-    
-
-    
-
-    
-</nav> 
+        
+  </ngx-navbar-collapse>
+</nav>
