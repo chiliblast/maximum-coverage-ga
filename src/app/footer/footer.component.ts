@@ -26,6 +26,9 @@ export class FooterComponent {
       if (msg == 'circle_popupation') {
         document.getElementById('circle_popupation').innerHTML = val;
       }
+      if (message == 'total_points_in_all_circles') {
+        document.getElementById('total_points_in_all_circles').innerHTML = this.MS.total_points_in_all_circles;
+      }
 
     });
   }

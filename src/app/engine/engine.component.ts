@@ -48,15 +48,17 @@ export class EngineComponent implements OnInit {
 
   mousedown(e:MouseEvent) { 
     const relative:Vector3 = this.engServ.get3DPosition( e.clientX, e.clientY );
-
-    //left mouse click
-    if(e.button == 0) { 
-      this.polygon.onMouseDown(relative)
+    if( relative ) {
+      //left mouse click
+      if(e.button == 0) { 
+        this.polygon.onMouseDown(relative)
+      }
+      //right mouse click
+      else if(e.button == 2) {
+        this.polygon.onStop(relative);
+      }
     }
-    //right mouse click
-    else if(e.button == 2) {
-      this.polygon.onStop(relative);
-    }
+    
   }
 
   mouseup(e:MouseEvent) { 
@@ -65,8 +67,8 @@ export class EngineComponent implements OnInit {
 
   mousemove(e:MouseEvent) { 
     const relative:Vector3 = this.engServ.get3DPosition( e.clientX, e.clientY );
-    
-    this.polygon.onMouseMove(relative);
+    if( relative )
+      this.polygon.onMouseMove(relative);
   }
 
 }

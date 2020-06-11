@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { EngineService } from '../engine/engine.service';
 import { MessageService } from './message.service';
-import { Vector3, MathUtils } from 'three';
+import { Vector3, MathUtils, Line } from 'three';
 import { Circle } from '../engine/circle';
 
 
@@ -28,28 +28,58 @@ export class FunctionService {
 
     const points_in_polygon:any = this.MS.points_in_polygon;
 
+    let total_points_in_all_circles:number = 0;
+
     for( let i = 0; i < initialPopulation; i++ ) {
       
-      const random:number = MathUtils.randInt( 0, points_in_polygon.length - 1 );
-      let count:number =  Math.floor(random / 3) * 3;
-      count = Math.round( count );
+      let random:number = MathUtils.randInt( 0, points_in_polygon.length - 1 );
+      random =  Math.floor(random / 3) * 3;
+      random = Math.round( random );
 
       //console.log(random + ", " + count + ", " + points_in_polygon.length)
 
-      const position:Vector3 = new Vector3( points_in_polygon[ count ].x, points_in_polygon[ count ].y, 0 );
+      const position:Vector3 = new Vector3( points_in_polygon[ random ].x, points_in_polygon[ random ].y, 0 );
 
       //console.log( this.is_circle_in_polygon(position, radius) )
       
       const circleID:number = circle.drawCircle( position, radius );
-      this.get_points_covered_in_circle( circleID );
+      total_points_in_all_circles = total_points_in_all_circles + this.get_points_in_circle( circleID );
     }
     
     this.MS.sendMessage( "circle_popupation:"+initialPopulation );
+
+    this.MS.total_points_in_all_circles = total_points_in_all_circles;
+    this.MS.sendMessage( "total_points_in_all_circles");
+
   }
 
-  
-  get_points_covered_in_circle( circleID:number ) {
-    //console.log( this.engServ.group.getObjectById( circleID ) )
+  //gt points in a circle which from points in polygon
+  get_points_in_circle( circleID:number ):number {
+    let circle = this.engServ.group.getObjectById( circleID );
+    const position = circle.userData.position;
+    const radius = circle.userData.radius;
+
+    const points:any = this.MS.points_in_polygon;
+
+    let points_in_circle:any = [];
+    let count:number = 0;
+
+    for( let i = 0; i < points.length; i++ ) {
+
+      const pointX:number = points[i].x;
+      const pointY:number = points[i].y;
+
+      const distance:number = this.get_distance_between_points( position.x, position.y, pointX, pointY );
+
+      if( distance <= radius ) {
+        count++;
+      }
+
+    }
+
+    circle.userData.pointsCount = count;
+
+    return count;
   }
 
   show_points_in_polygon() {
@@ -125,6 +155,12 @@ export class FunctionService {
           }
       }
     }
+  }
+
+  //line legth or distance between 2 points
+  get_distance_between_points( x1:number, y1:number, x2:number, y2:number ):number {
+    const distanceBetweenPoints:number = Math.sqrt( Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2) );
+    return distanceBetweenPoints;    
   }
 
 

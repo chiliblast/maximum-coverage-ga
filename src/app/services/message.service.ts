@@ -11,6 +11,8 @@ export class MessageService {
 
   public points_in_polygon = [];
 
+  public total_points_in_all_circles;
+
   public settings = {
     circles_total : 4,
     circles_size : 15
