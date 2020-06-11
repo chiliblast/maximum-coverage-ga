@@ -17,7 +17,7 @@ export class FunctionService {
   populate_circles( circle:Circle ) {
 
     this.remove_all_circles();
-    this.show_points_in_polygon();
+    this.reset_points_inCircle();
 
     const totalCircles:number = this.MS.settings.circles_total;
     let initialPopulation:number = totalCircles; //* totalCircles;
@@ -125,6 +125,13 @@ export class FunctionService {
     this.MS.points_in_polygon = points_in_polygon;
     this.MS.sendMessage('points_in_polygon');
  
+  }
+
+  private reset_points_inCircle() {
+    const points_in_polygon =  this.MS.points_in_polygon;
+    for(let i = 0; i < points_in_polygon.length; i++) {
+      this.MS.points_in_polygon[i].inCircle = 0;
+    }
   }
 
   private is_point_in_polygon( pointX:number, pointY:number, polygon:[] ) {
