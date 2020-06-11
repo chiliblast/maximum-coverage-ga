@@ -26,18 +26,17 @@ export class FunctionService {
       initialPopulation = 2;
     const radius:number = this.MS.settings.circles_size / 2;
 
-    const valid_points:any = this.MS.valid_points;
+    const points_in_polygon:any = this.MS.points_in_polygon;
 
     for( let i = 0; i < initialPopulation; i++ ) {
       
-      const random:number = MathUtils.randInt( 0, valid_points.length - 1 );
+      const random:number = MathUtils.randInt( 0, points_in_polygon.length - 1 );
       let count:number =  Math.floor(random / 3) * 3;
       count = Math.round( count );
 
+      //console.log(random + ", " + count + ", " + points_in_polygon.length)
 
-      console.log(random + ", " + count + ", " + valid_points.length)
-
-      const position:Vector3 = new Vector3( valid_points[ count ].x, valid_points[ count ].y, 0 );
+      const position:Vector3 = new Vector3( points_in_polygon[ count ].x, points_in_polygon[ count ].y, 0 );
 
       //console.log( this.is_circle_in_polygon(position, radius) )
       
@@ -60,7 +59,7 @@ export class FunctionService {
     const polygon:any = this.engServ.group.getObjectByName( "Polygon" );
     const polygonPosition = polygon.geometry.attributes.position.array;
 
-    let validPoints:any = [];
+    let points_in_polygon:any = [];
 
     for( let i = 0; i < pointPosition.length; ) {
 
@@ -79,14 +78,14 @@ export class FunctionService {
 
         points.geometry.attributes.color.needsUpdate = true;
         
-        validPoints.push( { x : pointX, y : pointY } );
+        points_in_polygon.push( { x : pointX, y : pointY } );
 
       }
 
       i = i + 3;
     }
 
-    this.MS.valid_points = validPoints;
+    this.MS.points_in_polygon = points_in_polygon;
  
   }
 
