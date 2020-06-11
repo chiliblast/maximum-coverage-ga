@@ -26,25 +26,21 @@ export class FunctionService {
       initialPopulation = 2;
     const radius:number = this.MS.settings.circles_size / 2;
 
+    const valid_points:any = this.MS.valid_points;
+
     for( let i = 0; i < initialPopulation; i++ ) {
       
-      const random:number = MathUtils.randInt( 0, this.MS.valid_points.count );
-      let count:number =  Math.ceil(random / 3) * 3;
+      const random:number = MathUtils.randInt( 0, valid_points.length );
+      let count:number =  Math.floor(random / 3) * 3;
       count = Math.round( count );
-      const position:Vector3 = new Vector3( this.MS.valid_points.position[ count ], this.MS.valid_points.position[ count + 1 ], this.MS.valid_points.position[ count + 2 ] );
+      const position:Vector3 = new Vector3( valid_points[ count ].x, valid_points[ count ].y, 0 );
   
-      if(position.x == position.y) {
-        console.log(random + ", " + count)
-      }
-
       //console.log( this.is_circle_in_polygon(position, radius) )
       
       const circleID:number = circle.drawCircle( position, radius );
       this.get_points_covered_in_circle( circleID );
     }
     
-    console.log("valid count:"+this.MS.valid_points.count) 
-    console.log("total positions:"+this.MS.valid_points.count*3) 
 
   }
 
@@ -60,8 +56,6 @@ export class FunctionService {
     const polygon:any = this.engServ.group.getObjectByName( "Polygon" );
     const polygonPosition = polygon.geometry.attributes.position.array;
 
-    let validPointsCount = 0;
-    let validPointLoop = 0;
     let validPoints:any = [];
 
     for( let i = 0; i < pointPosition.length; ) {
@@ -80,19 +74,15 @@ export class FunctionService {
         pointColor[ i + 2 ] = 255;
 
         points.geometry.attributes.color.needsUpdate = true;
+        
+        validPoints.push( { x : pointX, y : pointY } );
 
-        validPoints[ validPointLoop ] = pointX;
-        validPoints[ validPointLoop + 1 ] = pointY;
-        validPoints[ validPointLoop + 2 ] = 0;
-        validPointLoop = validPointLoop + 3;
-        validPointsCount++;
       }
 
       i = i + 3;
     }
 
-    this.MS.valid_points.count = validPointsCount;
-    this.MS.valid_points.position = validPoints;
+    this.MS.valid_points = validPoints;
  
   }
 

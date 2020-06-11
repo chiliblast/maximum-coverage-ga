@@ -19,10 +19,9 @@ export class Circle {
     }
 
     drawCircle( position:Vector3, radius:number ) {
-
-        this.circle = this.circleGeometry( radius, position );
+        const geometry:BufferGeometry = this.circleGeometry( radius, position );
+        this.circle = this.circleShape( geometry );
         this.circle.name = 'Circle';
-        //this.circle.position.copy( position );
 
         this.circle.userData.radius = radius;
         this.circle.userData.position = position;
@@ -47,7 +46,11 @@ export class Circle {
 
         // geometry
         const geometry:BufferGeometry = new BufferGeometry().setFromPoints( points );
+        return geometry;
         
+    }
+
+    circleShape( geometry:BufferGeometry ):Line {
         // material
         const material:LineBasicMaterial = new LineBasicMaterial(
             { color: 0x49BFFE }

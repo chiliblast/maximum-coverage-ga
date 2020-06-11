@@ -9,10 +9,7 @@ export class MessageService {
 
   private subject = new Subject<string>();
 
-  public valid_points = {
-    count : 0,
-    position : []
-  }
+  public valid_points = [];
 
   public settings = {
     circles_total : 4,
