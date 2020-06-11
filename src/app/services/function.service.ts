@@ -30,11 +30,15 @@ export class FunctionService {
 
     for( let i = 0; i < initialPopulation; i++ ) {
       
-      const random:number = MathUtils.randInt( 0, valid_points.length );
+      const random:number = MathUtils.randInt( 0, valid_points.length - 1 );
       let count:number =  Math.floor(random / 3) * 3;
       count = Math.round( count );
+
+
+      console.log(random + ", " + count + ", " + valid_points.length)
+
       const position:Vector3 = new Vector3( valid_points[ count ].x, valid_points[ count ].y, 0 );
-  
+
       //console.log( this.is_circle_in_polygon(position, radius) )
       
       const circleID:number = circle.drawCircle( position, radius );
