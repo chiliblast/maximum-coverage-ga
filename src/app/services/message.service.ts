@@ -9,9 +9,9 @@ export class MessageService {
 
   private subject = new Subject<string>();
 
-  public points_in_polygon = [];
+  public points_in_polygon = []; //{ x : pointX, y : pointY, inCircle: 0 }
 
-  public total_points_in_all_circles;
+  public total_points_in_all_circles:number;
 
   public settings = {
     circles_total : 4,

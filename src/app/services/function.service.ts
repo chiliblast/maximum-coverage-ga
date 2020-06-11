@@ -6,8 +6,6 @@ import { Vector3, MathUtils, Line } from 'three';
 import { Circle } from '../engine/circle';
 
 
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -19,11 +17,12 @@ export class FunctionService {
   populate_circles( circle:Circle ) {
 
     this.remove_all_circles();
+    this.show_points_in_polygon();
 
     const totalCircles:number = this.MS.settings.circles_total;
-    let initialPopulation:number = totalCircles * totalCircles;
-    if( initialPopulation == 1 ) 
-      initialPopulation = 2;
+    let initialPopulation:number = totalCircles; //* totalCircles;
+    //if( initialPopulation == 1 ) 
+      //initialPopulation = 2;
     const radius:number = this.MS.settings.circles_size / 2;
 
     const points_in_polygon:any = this.MS.points_in_polygon;
@@ -43,7 +42,8 @@ export class FunctionService {
       //console.log( this.is_circle_in_polygon(position, radius) )
       
       const circleID:number = circle.drawCircle( position, radius );
-      total_points_in_all_circles = total_points_in_all_circles + this.get_points_in_circle( circleID );
+      //get_total_points_in_all_circles
+      total_points_in_all_circles = total_points_in_all_circles + this.get_points_in_a_circle( circleID );
     }
     
     this.MS.sendMessage( "circle_popupation:"+initialPopulation );
@@ -54,14 +54,13 @@ export class FunctionService {
   }
 
   //gt points in a circle which from points in polygon
-  get_points_in_circle( circleID:number ):number {
+  get_points_in_a_circle( circleID:number ):number {
     let circle = this.engServ.group.getObjectById( circleID );
     const position = circle.userData.position;
     const radius = circle.userData.radius;
 
     const points:any = this.MS.points_in_polygon;
 
-    let points_in_circle:any = [];
     let count:number = 0;
 
     for( let i = 0; i < points.length; i++ ) {
@@ -71,8 +70,16 @@ export class FunctionService {
 
       const distance:number = this.get_distance_between_points( position.x, position.y, pointX, pointY );
 
+      //point is within circle
       if( distance <= radius ) {
-        count++;
+
+        //point is not within any circle
+        if( points[i].inCircle == 0 ) {
+          count++;
+          points[i].inCircle = count;
+        }
+          
+        
       }
 
     }
@@ -108,7 +115,7 @@ export class FunctionService {
 
         points.geometry.attributes.color.needsUpdate = true;
         
-        points_in_polygon.push( { x : pointX, y : pointY } );
+        points_in_polygon.push( { x : pointX, y : pointY, inCircle: 0 } );
 
       }
 
