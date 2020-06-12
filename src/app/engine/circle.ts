@@ -23,10 +23,11 @@ export class Circle {
         this.circle = this.circleShape( geometry );
         this.circle.name = 'Circle';
 
+        this.circle.userData.id = this.circle.id;
         this.circle.userData.radius = radius;
         this.circle.userData.position = position;
 
-        this.engServ.group.add(this.circle);
+        this.engServ.circleGroup.add(this.circle);
 
         return this.circle.id;
 

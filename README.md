@@ -15,3 +15,17 @@ Run `ng generate component component-name` to generate a new component. You can 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
 
+=========================
+
+## Prereq Steps
+    1. Download and Install Nodejs   https://nodejs.org/en/download/
+    2. Download and install Git      https://git-scm.com/
+    3. Create and goto folder maximum-coverage-ga
+    4. Git commands to pull project in command prompt:
+       git init
+       git remote add origin https://github.com/chiliblast/maximum-coverage-ga.git
+       git pull
+
+    5. Install all dependencies in command prompt:
+       npm install --save 
+

@@ -46,6 +46,7 @@ export class FunctionService {
       total_points_in_all_circles = total_points_in_all_circles + this.get_points_in_a_circle( circleID );
     }
     
+    this.MS.genetic_config.size = initialPopulation;
     this.MS.sendMessage( "circle_popupation:"+initialPopulation );
 
     this.MS.total_points_in_all_circles = total_points_in_all_circles;
@@ -55,7 +56,7 @@ export class FunctionService {
 
   //gt points in a circle which from points in polygon
   get_points_in_a_circle( circleID:number ):number {
-    let circle = this.engServ.group.getObjectById( circleID );
+    let circle = this.engServ.circleGroup.getObjectById( circleID );
     const position = circle.userData.position;
     const radius = circle.userData.radius;
 
@@ -72,12 +73,9 @@ export class FunctionService {
 
       //point is within circle
       if( distance <= radius ) {
- 
         count++;
-
         //inCircle will tell in how many circle this point is inside
-        points[i].inCircle = points[i].inCircle + 1;  
-        
+        points[i].inCircle = points[i].inCircle + 1;      
       }
 
     }
@@ -158,8 +156,8 @@ export class FunctionService {
 
   remove_all_circles() {
     //remove all circles from DimensionsGroup
-    if( this.engServ.group.getObjectByName("Circle") ) {
-      let group = this.engServ.group; 
+    if( this.engServ.circleGroup.getObjectByName("Circle") ) {
+      let group = this.engServ.circleGroup; 
       for (let i:number = 0; i < group.children.length; i++) {
           if( group.children[i].getObjectByName("Circle") ) {
             group.remove( group.children[i].getObjectByName("Circle") );

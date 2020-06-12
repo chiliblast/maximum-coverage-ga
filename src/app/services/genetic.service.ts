@@ -29,7 +29,7 @@ export class GeneticService {
 
   startGenetic() {
 
-    const config = {
+    let config = {
       "size": this.MS.genetic_config.size, //Population size
       "crossover": this.MS.genetic_config.crossover, //Probability of crossover
       "mutation": this.MS.genetic_config.mutation, //Probability of mutation
@@ -38,10 +38,27 @@ export class GeneticService {
       "maxResults": this.MS.genetic_config.maxResults, //The maximum number of best-fit results that webworkers will send per notification
       "webWorkers": this.MS.genetic_config.webWorkers, //Use Web Workers (when available)
       "skip": this.MS.genetic_config.skip //Setting this higher throttles back how frequently genetic.notification gets called in the main thread.
-		};
+    };
+    
+    if(config.size == 0) {
+      alert("Draw initial population to start Genetic Algorithm");
+      return;
+    }
 
-		const userData = {
-			
+    //make array of circle userData which contains id, position, radius and points count
+    /*let circles:any = [];
+    for (let i = 0; i < this.engServ.circleGroup.children.length; i++) {
+      let circle:any = this.engServ.circleGroup.children[i];
+      circles.push( circle.userData )
+    }*/
+
+		let userData = {
+      //array of points in polygon { x : pointX, y : pointY, inCircle: 0 }
+      "points_in_polygon" : this.MS.points_in_polygon, 
+      "total_points_in_all_circles" : this.MS.total_points_in_all_circles,
+      //array of circles
+      "circles" : this.engServ.circleGroup.children
+      
 		};
 
     this.genetic.evolve( config, userData );
@@ -57,18 +74,25 @@ export class GeneticService {
         genetic.select1 = Genetic.Select1.Tournament2;
         genetic.select2 = Genetic.Select2.Tournament2;
 
+
         //Called to create an individual, can be of any type (int, float, string, array, object)
         genetic.seed = function():any {
 
-          let  individual:any;
+          let  individual:any = [];
+
+          //individual.push( this.userData["circles"][this.see].object.userData )
 
           return individual;
         };
 
         //Computes a fitness score for an individual
         genetic.fitness = function( individual ):number {
-          
+          console.log(individual)
           let  fitness:number;
+          let pointsCount = 0;
+          for (let i = 0; i < individual.length; i++) {
+            //individual[0].object.userData.pointsCount
+          }
 
           return fitness;
         };
@@ -93,7 +117,7 @@ export class GeneticService {
         //Called for each generation. Return false to terminate end algorithm (ie- if goal state is reached)
         genetic.generation = function( pop, generation, stats ):boolean {
 
-           
+
           return false;
         };
 

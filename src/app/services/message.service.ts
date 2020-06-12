@@ -19,7 +19,7 @@ export class MessageService {
   }
   
   public genetic_config = {
-    "size": 250, //Population size
+    "size": 0, //Population size
     "crossover": 0.3, //Probability of crossover
     "mutation": 0.3, //Probability of mutation
     "iterations": 4000, //Maximum number of iterations before finishing

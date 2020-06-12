@@ -11,6 +11,7 @@ export class EngineService implements OnDestroy {
   private scene: Scene;
   private light: AmbientLight;
   public group: Group;
+  public circleGroup: Group;
 
   private frameId: number = null;
 
@@ -51,6 +52,9 @@ export class EngineService implements OnDestroy {
 
     this.group = new Group();
     this.scene.add( this.group );
+
+    this.circleGroup = new Group();
+    this.scene.add( this.circleGroup );
 
     //background image
     this.loadTransparentBackground();
