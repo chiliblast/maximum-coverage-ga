@@ -13,6 +13,10 @@ export class FooterComponent {
 
   subscription: Subscription;
 
+  public crossover:number = 0.3;
+  public mutation:number = 0.3;
+  public iterations:number = 4000;
+
   constructor(private engServ: EngineService, private MS: MessageService, private FS: FunctionService) {
     // subscribe to component messages
     this.subscription = this.MS.getMessage().subscribe(message => {
@@ -31,6 +35,15 @@ export class FooterComponent {
       }
 
     });
+  }
+
+  start_ga_clickHandler() {
+    
+    this.MS.genetic_config.crossover = this.crossover;
+    this.MS.genetic_config.mutation = this.mutation;
+    this.MS.genetic_config.iterations = this.iterations;
+
+    this.MS.sendMessage( "start_ga_click" );
   }
 
 

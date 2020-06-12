@@ -30,14 +30,14 @@ export class GeneticService {
   startGenetic() {
 
     const config = {
-      "size": 250, //Population size
-      "crossover": 0.3, //Probability of crossover
-      "mutation": 0.3, //Probability of mutation
-      "iterations": 4000, //Maximum number of iterations before finishing
-      "fittestAlwaysSurvives": true, //Prevents losing the best fit between generations
-      "maxResults": 100, //The maximum number of best-fit results that webworkers will send per notification
-      "webWorkers": true, //Use Web Workers (when available)
-      "skip": 20 //Setting this higher throttles back how frequently genetic.notification gets called in the main thread.
+      "size": this.MS.genetic_config.size, //Population size
+      "crossover": this.MS.genetic_config.crossover, //Probability of crossover
+      "mutation": this.MS.genetic_config.mutation, //Probability of mutation
+      "iterations": this.MS.genetic_config.iterations, //Maximum number of iterations before finishing
+      "fittestAlwaysSurvives": this.MS.genetic_config.fittestAlwaysSurvives, //Prevents losing the best fit between generations
+      "maxResults": this.MS.genetic_config.maxResults, //The maximum number of best-fit results that webworkers will send per notification
+      "webWorkers": this.MS.genetic_config.webWorkers, //Use Web Workers (when available)
+      "skip": this.MS.genetic_config.skip //Setting this higher throttles back how frequently genetic.notification gets called in the main thread.
 		};
 
 		const userData = {

@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { NgxNavbarModule } from 'ngx-bootstrap-navbar';
@@ -16,6 +17,7 @@ import { FooterComponent } from './footer/footer.component';
     FooterComponent,
   ],
   imports: [
+    FormsModule,
     BrowserModule,
     BrowserAnimationsModule,
     NgxNavbarModule

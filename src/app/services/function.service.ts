@@ -72,13 +72,11 @@ export class FunctionService {
 
       //point is within circle
       if( distance <= radius ) {
+ 
+        count++;
 
-        //point is not within any circle
-        if( points[i].inCircle == 0 ) {
-          count++;
-          points[i].inCircle = count;
-        }
-          
+        //inCircle will tell in how many circle this point is inside
+        points[i].inCircle = points[i].inCircle + 1;  
         
       }
 

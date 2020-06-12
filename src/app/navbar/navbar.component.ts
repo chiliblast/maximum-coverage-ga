@@ -51,9 +51,7 @@ export class NavbarComponent {
     this.MS.sendMessage( "navbar_populate_click" );
   }
 
-  start_ga_clickHandler() {
-    this.MS.sendMessage( "start_ga_click" );
-  }
+  
 
   
 
