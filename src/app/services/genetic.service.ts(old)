@@ -56,30 +56,41 @@ export class GeneticService {
       //array of points in polygon { x : pointX, y : pointY, inCircle: 0 }
       "points_in_polygon" : this.MS.points_in_polygon, 
       "total_points_in_all_circles" : this.MS.total_points_in_all_circles,
+      "radius" : this.MS.settings.circles_size / 2
       //array of circles
-      "circles" : this.engServ.circleGroup.children
-      
-		};
+      /*"circles" : this.engServ.circleGroup.children,*/
 
+      
+    };
+    
     this.genetic.evolve( config, userData );
     
   }
 
   createGenetic() {
-    
+
+        //let circle:Circle = new Circle(engServ, MS, FS);
+
         let genetic = Genetic.create();
 
         genetic.optimize = Genetic.Optimize.Maximize;
         
-        genetic.select1 = Genetic.Select1.Tournament2;
-        genetic.select2 = Genetic.Select2.Tournament2;
+        genetic.select1 = Genetic.Select1.RandomLinearRank;
+        genetic.select2 = Genetic.Select2.FittestRandom;
 
 
         //Called to create an individual, can be of any type (int, float, string, array, object)
         genetic.seed = function():any {
-
-          let  individual:any = [];
-
+          console.log("seed");
+          let  individual:any;
+          
+          let random:number = Math.floor(Math.random() * Math.floor( this.userData["points_in_polygon"].length - 1 ))
+          random =  Math.floor(random / 3) * 3;
+          random = Math.round( random );
+          let points = this.userData["points_in_polygon"];
+          let position = { x : points[ random ].x, y : points[ random ].y, inCircle : 0 };
+    
+          individual = position;
           //individual.push( this.userData["circles"][this.see].object.userData )
 
           return individual;
@@ -87,11 +98,24 @@ export class GeneticService {
 
         //Computes a fitness score for an individual
         genetic.fitness = function( individual ):number {
-          console.log(individual)
-          let  fitness:number;
-          let pointsCount = 0;
-          for (let i = 0; i < individual.length; i++) {
-            //individual[0].object.userData.pointsCount
+          console.log("fitness");
+          let  fitness:number=0;
+
+          let points = this.userData["points_in_polygon"];
+          for (let i = 0; i < this.userData["points_in_polygon"].length; i++) {
+            const pointX:number = points[i].x;
+            const pointY:number = points[i].y;
+            const distance:number = get_distance_between_points( individual.x, individual.y, pointX, pointY );
+            //point is within circle
+            if( distance <= this.userData["radius"] ) {   
+              fitness++;   
+            }
+          }
+
+          //line legth or distance between 2 points
+          function get_distance_between_points( x1:number, y1:number, x2:number, y2:number ):number {
+            const distanceBetweenPoints:number = Math.sqrt( Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2) );
+            return distanceBetweenPoints;    
           }
 
           return fitness;
@@ -99,7 +123,7 @@ export class GeneticService {
 
         //Called when an individual has been selected for mutation
         genetic.mutate = function( individual ):any {
-          
+          console.log("mutate");
           let  _individual:any;
 
           return _individual;          
@@ -107,7 +131,9 @@ export class GeneticService {
 
         //Called when two individuals are selected for mating. Two children should always returned
         genetic.crossover = function( mother, father ):any {
-
+          console.log("crossover");
+console.log(mother)
+console.log(father)
           let son:any;
           let daughter:any;
 
@@ -116,15 +142,18 @@ export class GeneticService {
 
         //Called for each generation. Return false to terminate end algorithm (ie- if goal state is reached)
         genetic.generation = function( pop, generation, stats ):boolean {
+          console.log("generation");
 
-
-          return false;
+          return true;
         };
 
         //Runs in the calling context. All functions other than this one are run in a web worker.
         genetic.notification = function( pop, generation, stats, isFinished ) {
-
-
+          console.log("notification");
+/*console.log(pop)
+console.log(generation)
+console.log(stats)
+console.log(isFinished)*/
         };
     
         this.genetic = genetic;

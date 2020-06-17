@@ -6,7 +6,7 @@ import { MessageService } from '../services/message.service';
 import { FunctionService } from '../services/function.service';
 import { Polygon } from './polygon';
 import { Circle } from './circle';
-import { GeneticService } from '../services/genetic.service';
+import { Genetic } from '../genetic/genetic';
 
 
 
@@ -20,7 +20,7 @@ export class EngineComponent implements OnInit {
   subscription: Subscription;
   private polygon:Polygon;
   private circle:Circle;
-  private GS:GeneticService;
+  private genetic:Genetic;
 
   @ViewChild('rendererCanvas', {static: true})
   public rendererCanvas: ElementRef<HTMLCanvasElement>;
@@ -37,7 +37,8 @@ export class EngineComponent implements OnInit {
 
     this.polygon = new Polygon( this.engServ, this.MS, this.FS );
     this.circle = new Circle( this.engServ, this.MS, this.FS );
-    this.GS = new GeneticService( this.engServ, this.MS, this.FS );
+    this.genetic = new Genetic( this.engServ, this.MS, this.FS, this.circle );
+
 
   }
 

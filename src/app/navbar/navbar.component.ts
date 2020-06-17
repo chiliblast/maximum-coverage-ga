@@ -40,7 +40,7 @@ export class NavbarComponent {
   }
 
   circles_total_changeHandler( value: number ) {
-    this.circlesTotal = this.MS.settings.circles_total = value;
+    this.circlesTotal = this.MS.settings.circles_total = this.MS.genetic_config.size = value;
   }
 
   circles_size_changeHandler( value: number ) {

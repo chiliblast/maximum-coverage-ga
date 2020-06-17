@@ -13,9 +13,9 @@ export class FooterComponent {
 
   subscription: Subscription;
 
-  public crossover:number = 0.3;
-  public mutation:number = 0.3;
-  public iterations:number = 4000;
+  public crossover:number = 1;
+  public mutation:number = 1;
+  public iterations:number = 1000;
 
   constructor(private engServ: EngineService, private MS: MessageService, private FS: FunctionService) {
     // subscribe to component messages

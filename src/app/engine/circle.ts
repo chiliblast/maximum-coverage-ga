@@ -26,6 +26,7 @@ export class Circle {
         this.circle.userData.id = this.circle.id;
         this.circle.userData.radius = radius;
         this.circle.userData.position = position;
+        this.circle.userData.selected = false;
 
         this.engServ.circleGroup.add(this.circle);
 
