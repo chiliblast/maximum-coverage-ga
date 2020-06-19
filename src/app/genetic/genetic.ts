@@ -1,4 +1,4 @@
-import { Line } from 'three';
+import { Line, Vector3 } from 'three';
 
 import { Subscription } from 'rxjs';
 import { EngineService } from '../engine/engine.service';
@@ -42,6 +42,8 @@ export class Genetic {
           return true;
     }
 
+
+//---------------------------------------------------------------------------
     start() {
 
         var population:any = []; //population of circles
@@ -51,10 +53,11 @@ export class Genetic {
         for( let i = 0; i < this.config.iterations; i++ ) {
 
             console.log("Iteration:" + (i+1));
-
+            
             population = this.engServ.circleGroup.children;
             points_in_polygon = this.MS.points_in_polygon;
             total_points_in_all_circles = this.MS.total_points_in_all_circles;
+            console.log("Population:"+population.length)
 
             this.fitness( population );
 
@@ -62,39 +65,57 @@ export class Genetic {
             var selected:any = this.selection( population );
 
             //delete population that is not selected
-            this.discardPopulation( selected, population );
-
+            this.discardPopulation( selected );
+   
             var children:any = [];
 
             if( Math.random() <= this.config.crossover ) {
                 children = this.crossover( selected );
             }
 
+            if( Math.random() <= this.config.mutation ) {
+                children = this.mutation( children );
+            }
+
             if( children.length > 0 ) {
                 for ( let i = 0; i < children.length; i++) {            
                     this.FS.populate_a_circle( this.circle, children[i].son.position, children[i].son.radius );
-                    this.FS.populate_a_circle( this.circle, children[i].daughter.position, children[i].daughter.radius )
+                    this.FS.populate_a_circle( this.circle, children[i].daughter.position, children[i].daughter.radius );
                 }
             }
 
-            if( Math.random() <= this.config.mutation ) {
-                this.mutation();
-            }
+            
 
-            if( population.length <= this.MS.settings.circles_total ) {
+            this.FS.set_total_points_in_all_circles();
+
+            //break if population is less then total circles
+            //or total points in circles is less that total points in polygon
+            if( population.length <= this.MS.settings.circles_total 
+                /*|| this.MS.total_points_in_all_circles <= this.MS.points_in_polygon.length*/ ) {
+                
                 this.MS.sendMessage( "circle_popupation:"+population.length );
-                console.log("Population:"+population.length)
-                console.log("Population size reached");
+                console.log("Population:"+population.length);
+
+                if( population.length <= this.MS.settings.circles_total )
+                    console.log("Population size reached:"+population.length);
+                /*else if( this.MS.total_points_in_all_circles <= this.MS.points_in_polygon.length )
+                    console.log("Max points covered");  */  
                 break;
+
             }
                 
             this.MS.sendMessage( "circle_popupation:"+population.length );
-            console.log("Population:"+population.length)
+            console.log("Population:"+population.length);
             
         }
 
  
     }
+//---------------------------------------------------------------------------
+
+
+
+
 
     fitness( population:any ) {
 
@@ -104,10 +125,10 @@ export class Genetic {
             var circle:any = population[i];
 
             //more the radius, more the fitness level is
-            circle.userData.fitness = circle.userData.radius;
+            //circle.userData.fitness = circle.userData.radius;
 
             //number of total points in a circle
-            circle.userData.fitness = circle.userData.fitness + circle.userData.circlePoints.length;
+            circle.userData.fitness = circle.userData.circlePoints.length;
 
             //fitness will be nagative when a point is within more than 1 circle
             for( let j = 0; j < circle.userData.circlePoints.length; j++ ) {
@@ -128,24 +149,32 @@ export class Genetic {
 
         console.log("Selection");
 
-        //selects half of total population and sort then in acsending order of fitness level
+        //selects half of total population and sorts them in acsending order of fitness level
         var selected:any = [];
         var max = -Infinity;
-        var maxCircle:any;
+        var maxCircle:any; 
         for( var i = 0; i < population.length; i++ ) {
             var circle:any = population[i];
 
-            if( circle.userData.selected == true )
-                continue;
-
+            if( circle.userData.selected == true ) {
+                //end of loop
+                if( i >= population.length - 1 ) { 
+                    maxCircle.userData.selected = true;
+                    selected.push( maxCircle );
+                    max = -Infinity;
+                    i = -1;
+                }
+                else
+                    continue;
+            }
+                
             //console.log(circle.userData.fitness +" "+max)   
 
-
-            if( circle.userData.fitness > max ) {
+            if( circle.userData.fitness >= max ) { 
                 max = circle.userData.fitness;   
                 maxCircle = circle;
             }
-               
+  
             //end of loop
             if( i >= population.length - 1 ) { 
                 maxCircle.userData.selected = true;
@@ -155,12 +184,12 @@ export class Genetic {
             }
 
             //select half of number of total circles
-            if( selected.length >= population.length / 2 ) {
+            if( selected.length >= population.length / 2 ) {       
                 break;
             }
 
         }
-        console.log("Selected length:"+selected.length)
+        console.log("Selected:"+selected.length)
         return selected;
 
     }
@@ -176,15 +205,18 @@ export class Genetic {
             var father:any = selected[i];
             var mother:any = selected[i+1];
 
-            var son:any = {radius:null, position:null};
-            var daughter:any = {radius:null, position:null};
+            var son:any = { radius:null, position:{x:null,y:null}  };
+            var daughter:any = { radius:null, position:{x:null,y:null} };
 
             if( father!=undefined && mother != undefined ) {
+
                 son.radius = father.userData.radius;
-                son.position = mother.userData.position;
+                son.position.x = ( father.userData.position.x );
+                son.position.y = ( father.userData.position.y );
 
                 daughter.radius = mother.userData.radius;
-                daughter.position = father.userData.position;
+                daughter.position.x = ( mother.userData.position.x );
+                daughter.position.y = ( mother.userData.position.y );
 
                 children.push( {son:son, daughter:daughter} )
             }
@@ -195,25 +227,55 @@ export class Genetic {
         return children;
     }
 
-    mutation() {
+    mutation( children:any ) {
 
         console.log("Mutation");
 
+        for( var i = 0; i < children.length; i++) {
+
+            if( Math.random() >= 0.5 ) {
+                console.log("Mutating:"+ (i+1) + " of " + children.length);
+
+                const points_in_polygon:any = this.MS.points_in_polygon;
+                let random:number;
+                let position:Vector3;
+                
+
+                random = Math.floor(Math.random() * Math.floor( points_in_polygon.length - 1 ));
+                random =  Math.floor(random / 3) * 3;
+                random = Math.round( random );
+                position = new Vector3( points_in_polygon[ random ].x, points_in_polygon[ random ].y, 0 );
+
+                children[i].son.position = position;
+
+                random = Math.floor(Math.random() * Math.floor( points_in_polygon.length - 1 ));
+                random =  Math.floor(random / 3) * 3;
+                random = Math.round( random );
+                position = new Vector3( points_in_polygon[ random ].x, points_in_polygon[ random ].y, 0 );
+
+                children[i].daughter.position = position;
+
+            }
+
+        }
+
+        return children;
     }
     
-    discardPopulation( selected:any, population:any ) {
+    discardPopulation( selected:any ) {
 
         //remove all circles
-        for( var i = 0; i < population.length; i++ ) {
+        /*for( var i = 0; i < population.length; i++ ) {
             let circle:any = population[i];
             this.engServ.circleGroup.remove(circle );
             i = -1;
-        }
+        }*/
+        this.FS.remove_all_circles();
 
         //add selected circles
         for( var i = 0; i < selected.length; i++ ) { 
             let circle:any = selected[i];
-            circle.userData.selected = true;
+            circle.userData.selected = false;
             this.engServ.circleGroup.add( circle )
 
         }

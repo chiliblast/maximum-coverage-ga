@@ -42,7 +42,8 @@ export class FunctionService {
 
       //console.log( this.is_circle_in_polygon(position, radius) )
 
-      let radius:number =  MathUtils.randInt( 1, this.MS.settings.circles_size / 2 );  
+      //let radius:number =  MathUtils.randInt( 1, this.MS.settings.circles_size / 2 ); 
+      let radius:number =  this.MS.settings.circles_size / 2;  
 
       const circleID:number = circle.drawCircle( position, radius );
       //get_total_points_in_all_circles
@@ -62,6 +63,17 @@ export class FunctionService {
     //get_total_points_in_all_circles
     this.MS.total_points_in_all_circles = this.MS.total_points_in_all_circles + this.get_points_in_a_circle( circleID );
     this.MS.sendMessage( "total_points_in_all_circles");
+  }
+
+  set_total_points_in_all_circles() {
+    var circle:any = this.engServ.circleGroup.children;
+    var total_points_in_all_circles:number = 0;
+    for( let i = 0; i < circle.length; i++ ) {
+      total_points_in_all_circles = total_points_in_all_circles + circle[i].userData.circlePoints.length;
+    }
+    this.MS.total_points_in_all_circles = total_points_in_all_circles;
+    this.MS.sendMessage( "total_points_in_all_circles");
+
   }
 
   /*populate_a_circle( circle:Circle ):number {
@@ -188,7 +200,7 @@ export class FunctionService {
   }
 
   remove_all_circles() {
-    //remove all circles from DimensionsGroup
+    //remove all circles from Circle Group
     if( this.engServ.circleGroup.getObjectByName("Circle") ) {
       let group = this.engServ.circleGroup; 
       for (let i:number = 0; i < group.children.length; i++) {
