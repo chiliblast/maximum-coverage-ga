@@ -52,7 +52,7 @@ export class Genetic {
 
         for( let i = 0; i < this.config.iterations; i++ ) {
 
-            console.log("Iteration:" + (i+1));
+            console.log("ITERATION--------------:" + (i+1));
             
             population = this.engServ.circleGroup.children;
             points_in_polygon = this.MS.points_in_polygon;
@@ -69,9 +69,7 @@ export class Genetic {
    
             var children:any = [];
 
-            if( Math.random() <= this.config.crossover ) {
-                children = this.crossover( selected );
-            }
+            children = this.crossover( selected );
 
             if( Math.random() <= this.config.mutation ) {
                 children = this.mutation( children );
@@ -209,14 +207,14 @@ export class Genetic {
             var daughter:any = { radius:null, position:{x:null,y:null} };
 
             if( father!=undefined && mother != undefined ) {
-
+                
                 son.radius = father.userData.radius;
-                son.position.x = ( father.userData.position.x );
-                son.position.y = ( father.userData.position.y );
+                son.position = this.FS.get_random_point_between_two_points( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y );
+                //son.position = this.FS.get_point_adjacent_to_circle( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y, father.userData.radius, mother.userData.radius );
 
-                daughter.radius = mother.userData.radius;
-                daughter.position.x = ( mother.userData.position.x );
-                daughter.position.y = ( mother.userData.position.y );
+                daughter.radius = father.userData.radius;
+                //daughter.position = this.FS.get_random_point_between_two_points( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y );
+                daughter.position = this.FS.get_point_adjacent_to_circle( mother.userData.position.x, mother.userData.position.y, father.userData.position.x, father.userData.position.y, mother.userData.radius, father.userData.radius );
 
                 children.push( {son:son, daughter:daughter} )
             }
@@ -238,22 +236,39 @@ export class Genetic {
 
                 const points_in_polygon:any = this.MS.points_in_polygon;
                 let random:number;
-                let position:Vector3;
+                let randomPosition:Vector3;
                 
+                random = Math.floor(Math.random() * Math.floor( points_in_polygon.length - 1 ));
+                random =  Math.floor(random / 3) * 3;
+                random = Math.round( random );
+                randomPosition = new Vector3( points_in_polygon[ random ].x, points_in_polygon[ random ].y, 0 );
+
+                //check if new random point already has a cicle in population
+                if( this.FS.is_circle_at_point( randomPosition ) == false ) {
+                    children[i].son.position = randomPosition;
+                }
+                //mutate again
+                else {
+                    console.log("Muatating again");
+                    i = i - 1;
+                    continue;
+                }
 
                 random = Math.floor(Math.random() * Math.floor( points_in_polygon.length - 1 ));
                 random =  Math.floor(random / 3) * 3;
                 random = Math.round( random );
-                position = new Vector3( points_in_polygon[ random ].x, points_in_polygon[ random ].y, 0 );
+                randomPosition = new Vector3( points_in_polygon[ random ].x, points_in_polygon[ random ].y, 0 );
 
-                children[i].son.position = position;
-
-                random = Math.floor(Math.random() * Math.floor( points_in_polygon.length - 1 ));
-                random =  Math.floor(random / 3) * 3;
-                random = Math.round( random );
-                position = new Vector3( points_in_polygon[ random ].x, points_in_polygon[ random ].y, 0 );
-
-                children[i].daughter.position = position;
+                //check if new random point already has a cicle in population
+                if( this.FS.is_circle_at_point( randomPosition ) == false ) {
+                    children[i].daughter.position = randomPosition;
+                }
+                //mutate again
+                else {
+                    console.log("Muatating again");
+                    i = i - 1;
+                    continue;
+                }
 
             }
 
@@ -263,40 +278,13 @@ export class Genetic {
     }
     
     discardPopulation( selected:any ) {
-
-        //remove all circles
-        /*for( var i = 0; i < population.length; i++ ) {
-            let circle:any = population[i];
-            this.engServ.circleGroup.remove(circle );
-            i = -1;
-        }*/
+        //remove all population
         this.FS.remove_all_circles();
-
         //add selected circles
         for( var i = 0; i < selected.length; i++ ) { 
             let circle:any = selected[i];
-            circle.userData.selected = false;
-            this.engServ.circleGroup.add( circle )
-
+            this.FS.populate_a_circle( this.circle, circle.userData.position, circle.userData.radius );
         }
-
         
-        /*for( var i = 0; i < population.length; i++ ) {
-            var circle:any = population[i];
-
-            var found:boolean = false;
-            for( let j = 0; j < selected.length; j++ ) { 
-
-                if( circle.userData.id == selected[j].userData.id ) {
-                    found = true;
-                    break;
-                }
-
-            }
-            if( found == false ) {
-                this.engServ.circleGroup.remove(circle );
-            }
-
-        }*/
     }
 }

@@ -13,7 +13,6 @@ export class FooterComponent {
 
   subscription: Subscription;
 
-  public crossover:number = 1;
   public mutation:number = 1;
   public iterations:number = 1000;
 
@@ -39,7 +38,6 @@ export class FooterComponent {
 
   start_ga_clickHandler() {
     
-    this.MS.genetic_config.crossover = this.crossover;
     this.MS.genetic_config.mutation = this.mutation;
     this.MS.genetic_config.iterations = this.iterations;
 

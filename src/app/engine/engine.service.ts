@@ -123,8 +123,6 @@ export class EngineService implements OnDestroy {
     points.name = "Points";
     this.group.add( points );
 
-
-
   }
 
   public animate(): void {
