@@ -35,7 +35,7 @@ export class Circle {
     }
 
     private circleGeometry( radius:number, position:Vector3 ) {
-        
+        //console.log(position.x + ", " + position.y + ", " + radius)
         let curve:EllipseCurve = new EllipseCurve(
             position.x,  position.y,            // ax, aY
             radius, radius,           // xRadius, yRadius
@@ -43,11 +43,12 @@ export class Circle {
             false,            // aClockwise
             0                // aRotation
         );
-        
+ 
         const points = curve.getPoints( 50 );
-
+    
         // geometry
         const geometry:BufferGeometry = new BufferGeometry().setFromPoints( points );
+  
         return geometry;
         
     }

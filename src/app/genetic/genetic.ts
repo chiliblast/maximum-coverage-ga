@@ -1,16 +1,18 @@
-import { Line, Vector3 } from 'three';
+import { Vector3 } from 'three';
 
 import { Subscription } from 'rxjs';
 import { EngineService } from '../engine/engine.service';
 import { MessageService } from '../services/message.service';
 import { FunctionService } from '../services/function.service';
 import { Circle } from '../engine/circle';
+import { Binary } from './binary';
 
 export class Genetic {
 
     subscription: Subscription;
 
     private config:any = {};
+    private binary:Binary = new Binary();
 
     constructor( private engServ: EngineService, private MS: MessageService, private FS: FunctionService, private circle:Circle ) {
         // subscribe to component messages
@@ -71,9 +73,7 @@ export class Genetic {
 
             children = this.crossover( selected );
 
-            if( Math.random() <= this.config.mutation ) {
-                children = this.mutation( children );
-            }
+            children = this.mutation( children );
 
             if( children.length > 0 ) {
                 for ( let i = 0; i < children.length; i++) {            
@@ -81,8 +81,6 @@ export class Genetic {
                     this.FS.populate_a_circle( this.circle, children[i].daughter.position, children[i].daughter.radius );
                 }
             }
-
-            
 
             this.FS.set_total_points_in_all_circles();
 
@@ -209,13 +207,18 @@ export class Genetic {
             if( father!=undefined && mother != undefined ) {
                 
                 son.radius = father.userData.radius;
-                son.position = this.FS.get_random_point_between_two_points( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y );
+                //son.position = this.FS.get_random_point_between_two_points( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y );
                 //son.position = this.FS.get_point_adjacent_to_circle( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y, father.userData.radius, mother.userData.radius );
 
                 daughter.radius = father.userData.radius;
                 //daughter.position = this.FS.get_random_point_between_two_points( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y );
-                daughter.position = this.FS.get_point_adjacent_to_circle( mother.userData.position.x, mother.userData.position.y, father.userData.position.x, father.userData.position.y, mother.userData.radius, father.userData.radius );
+                //daughter.position = this.FS.get_point_adjacent_to_circle( mother.userData.position.x, mother.userData.position.y, father.userData.position.x, father.userData.position.y, mother.userData.radius, father.userData.radius );
 
+                let offsprings:any = this.binary.binSwapping( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y );
+               
+                son.position = offsprings.firstOffsping;
+                daughter.position = offsprings.secondOffsping;
+         
                 children.push( {son:son, daughter:daughter} )
             }
         
@@ -231,7 +234,7 @@ export class Genetic {
 
         for( var i = 0; i < children.length; i++) {
 
-            if( Math.random() >= 0.5 ) {
+            if( Math.random() <= this.config.mutation ) {
                 console.log("Mutating:"+ (i+1) + " of " + children.length);
 
                 const points_in_polygon:any = this.MS.points_in_polygon;
@@ -249,7 +252,7 @@ export class Genetic {
                 }
                 //mutate again
                 else {
-                    console.log("Muatating again");
+                    console.log("Mutating again");
                     i = i - 1;
                     continue;
                 }
