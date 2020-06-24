@@ -36,7 +36,7 @@ export class FunctionService {
       random =  Math.floor(random / 3) * 3;
       random = Math.round( random );
 
-      //console.log(random + ", " + count + ", " + points_in_polygon.length)
+      //console.log(random  + ", " + points_in_polygon.length);
 
       const position:Vector3 = new Vector3( points_in_polygon[ random ].x, points_in_polygon[ random ].y, 0 );
 
@@ -115,10 +115,16 @@ export class FunctionService {
 
       //point is within circle's radius
       if( distance <= radius ) {
-        count++;
+        //count++;
         //inCircle will tell in how many circles this point is inside
         points[i].inCircle = points[i].inCircle + 1; 
-        circlePoints.push( points[i] );     
+        circlePoints.push( points[i] );    
+        
+        //if point in circle is only covered with one circle
+        if( points[i].inCircle == 1 ) {
+          count++;
+        }
+
       }
 
     }
@@ -228,7 +234,7 @@ export class FunctionService {
     return newPoint;
   }
 
-  private reset_points_inCircle_to_zero() {
+  public reset_points_inCircle_to_zero() {
     const points_in_polygon =  this.MS.points_in_polygon;
     for(let i = 0; i < points_in_polygon.length; i++) {
       this.MS.points_in_polygon[i].inCircle = 0;

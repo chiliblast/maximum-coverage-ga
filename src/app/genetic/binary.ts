@@ -19,19 +19,9 @@ export class Binary {
         return digit;
     }
     
-    private binaryToDecimalParseConvertFullNo(latlongBinary)
-    {
-        var myStrArray = latlongBinary.toString().split('.');
-        var leftBinary = myStrArray[0];
-        var rightBinary = myStrArray[1];
-        //console.log("Left Binary");
-        //console.log(leftBinary);
-        //console.log("right Binary");
-        //console.log(rightBinary);
-        return this.binaryToDecimal(leftBinary).toString()+"."+this.binaryToDecimal(rightBinary).toString();
-    }
     
-    //this function will return the binary format of Decimal no
+    
+    //this private will return the binary format of Decimal no
     private latlongToBinaryConversion(decimalNo)
     {
         var bno = parseInt(decimalNo);
@@ -43,73 +33,7 @@ export class Binary {
         return binaryNo;
     }
     
-    private latlongParseConvertinBinary(latLongValue)
-    {
     
-        var myStrArray = latLongValue.toString().split('.');
-        var leftDecimal = myStrArray[0];
-        var rightDecimal = myStrArray[1];
-        //console.log("Left Decimal");
-        //console.log(leftDecimal);
-        //console.log("right Decimal");
-        //console.log(rightDecimal);
-        return this.latlongToBinaryConversion(leftDecimal).toString()+"."+this.latlongToBinaryConversion(rightDecimal).toString();
-    
-    }
-    
-    private binaryFormatLatLongSwapping(latLongFirstPoint,latLongSecondPoint)
-    {
-        var strFirstPointArray = new Array();
-        strFirstPointArray = latLongFirstPoint.toString().split('.');
-        var strSecondPointArray = new Array();
-        strSecondPointArray = latLongSecondPoint.toString().split('.');
-        var leftFirstPoint = strFirstPointArray[0];
-        var rightFirstPoint = strFirstPointArray[1];
-        var leftSecondPoint = strSecondPointArray[0];
-        var rightSecondPoint = strSecondPointArray[1];
-        var resultArrayLeft = new Array();
-        var resultArrayRight = new Array();
-        var resultArrayFinal = new Array();
-    
-        
-       //console.log("In Function of binaryFormatLatLongSwapping ");
-       
-        //console.log("lat long first point");
-        //console.log(latLongFirstPoint);
-        //console.log("lat long Second point");
-        //console.log(latLongSecondPoint);
-        
-        //console.log("str first point array");
-        //console.log(strFirstPointArray);
-        //console.log("str Second point array");
-        //console.log(strSecondPointArray);    
-        
-        //console.log("left First Point");
-        //console.log(leftFirstPoint);
-    
-        //console.log("right First Point");
-        //console.log(rightFirstPoint);
-    
-        //console.log("left Second Point");
-        //console.log(leftSecondPoint);
-    
-        //console.log("right Second Point");
-        //console.log(rightSecondPoint);
-    
-        
-        resultArrayLeft = this.binarySwappingOneBit(leftFirstPoint,leftSecondPoint);
-        resultArrayRight = this.binarySwappingfourBitFirstThreeBitLast(rightFirstPoint,rightSecondPoint);
-    
-        //console.log("After performing binary swapping one bit result array left");
-        //console.log(resultArrayLeft);
-        //console.log("result array right");
-        //console.log(resultArrayRight);
-    
-        resultArrayFinal.push(resultArrayLeft[0].toString()+"."+resultArrayRight[0].toString());
-        resultArrayFinal.push(resultArrayLeft[1].toString()+"."+resultArrayRight[1].toString());   
-    
-        return resultArrayFinal;
-    }
     
     //-------------this is random one bit Binary Swapping function result two new Strings-------------
     //---------------One String = Pakistan   2nd String = Olympics
@@ -170,27 +94,37 @@ export class Binary {
     
         var resultArray = new Array();
     
-        var randomNo = Math.floor((Math.random() * 1) + 3);
+        var randomNo = Math.floor((Math.random() * 2) + 1);
         var swapNoSecond;
         
-        if(randomNo == 4)    
-            swapNoSecond = 3;
+        if(randomNo == 3)    
+            swapNoSecond = 2;
         else
-            swapNoSecond = 4;
+            swapNoSecond = 1;
         
         
         var SwappedN2;
         var SwappedN1;
     
-        if(swapNoSecond==4)
+    
+        //console.log("random no");
+        //console.log(randomNo);
+        //console.log("swapped bit");
+        //console.log(swapNoSecond);
+    
+        if(swapNoSecond==2)
         {
-            SwappedN2 = binaryFather.toString().substr(0,4)+binaryMother.toString().substr(4,binaryMother.length-4);//binaryMother.length-3,3);
-            SwappedN1 = binaryMother.toString().substr(0,4)+binaryFather.toString().substr(4,binaryMother.length-4);//binaryFather.length-3,3);
+            
+    
+            SwappedN2 = binaryFather.toString().substr(0,3)+binaryMother.toString().substr(3,binaryMother.length-3);//binaryMother.length-3,3);
+            SwappedN1 = binaryMother.toString().substr(0,3)+binaryFather.toString().substr(3,binaryFather.length-3);//binaryFather.length-3,3);
         }
         else
         {
-            SwappedN2 = binaryFather.toString().substr(0,3)+binaryMother.toString().substr(3,binaryMother.length-3);//binaryMother.length-4,4);
-            SwappedN1 = binaryMother.toString().substr(0,3)+binaryFather.toString().substr(3,binaryMother.length-3);//binaryFather.length-4,4);
+           // //console.log(binaryFather.toString().substr(0,1));
+           // //console.log(binaryMother.toString().substr(1,binaryMother.length-1));
+            SwappedN2 = binaryFather.toString().substr(0,2)+binaryMother.toString().substr(2,binaryMother.length-2);//binaryMother.length-4,4);
+            SwappedN1 = binaryMother.toString().substr(0,2)+binaryFather.toString().substr(2,binaryFather.length-2);//binaryFather.length-4,4);
         }    
     
         //console.log("swapped N2");
@@ -206,156 +140,42 @@ export class Binary {
         return resultArray;
     }
     
-    private binaryToOneBitMutation(binaryValue)
-    {
-    
-        var firstMutationBit = Math.floor((Math.random() * 3) + 1);
-        
-        
-        var ranCharN1 = this.getCharAt(binaryValue.toString(),firstMutationBit-1);//Starting from 1 ,2, 3   
-       
-        //console.log("random no for First Mutation");
-        //console.log(firstMutationBit);    
-        //console.log("orignal binary");
-        //console.log(binaryValue);
-    
-        var SwappedN1; 
-    
-        if(ranCharN1 == '0')
-        {
-            SwappedN1 = this.setCharAt(binaryValue.toString(),firstMutationBit-1,'1');
-            
-        }
-        else
-        {
-            SwappedN1 = this.setCharAt(binaryValue.toString(),firstMutationBit-1,'0');        
-    
-        }
-        
-        //console.log("After Mutation of One Bit Final value");
-        //console.log(SwappedN1);
-    
-        return SwappedN1;
-    }
-    
-    
-    private binaryToTwoBitMutation(binaryValue)
-    {
-    
-        var firstMutationBit = Math.floor((Math.random() * 3) + 1);
-        var secondMutationBit = firstMutationBit+2;
-        
-        var ranCharN1 = this.getCharAt(binaryValue.toString(),firstMutationBit-1);//Starting from 1 ,2, 3
-        var ranCharN2 = this.getCharAt(binaryValue.toString(),secondMutationBit-1);
-        //console.log("random no for First Mutation");
-        //console.log(firstMutationBit);
-        //console.log("No for Second Mutation");
-        //console.log(secondMutationBit);
-        //console.log("orignal binary");
-        //console.log(binaryValue);
-    
-        var SwappedN1; 
-    
-        if(ranCharN1 == '0')
-        {
-            SwappedN1 = this.setCharAt(binaryValue.toString(),firstMutationBit-1,'1');
-            if(ranCharN2 == '0')
-            {
-                SwappedN1 = this.setCharAt(SwappedN1.toString(),secondMutationBit-1,'1');
-            }
-            else
-            {
-                SwappedN1 = this.setCharAt(SwappedN1.toString(),secondMutationBit-1,'0');
-            }
-        }
-        else
-        {
-            SwappedN1 = this.setCharAt(binaryValue.toString(),firstMutationBit-1,'0'); 
-            if(ranCharN2 == '0')
-            {
-                SwappedN1 = this.setCharAt(SwappedN1.toString(),secondMutationBit-1,'1');
-            }
-            else
-            {
-                SwappedN1 = this.setCharAt(SwappedN1.toString(),secondMutationBit-1,'0');
-            }
-    
-        }
-        
-        //console.log("After Mutation of Both bits Final value");
-        //console.log(SwappedN1);
-    
-        return SwappedN1;
-    }
-    
-    
-    private binaryParseApplyMutation(binaryLat,binaryLong)
-    {
-        var strFirstPointArray = new Array();
-        strFirstPointArray = binaryLat.toString().split('.');
-        var strSecondPointArray = new Array();
-        strSecondPointArray = binaryLong.toString().split('.');
-        var leftLatPoint = strFirstPointArray[0];
-        var rightLatPoint = strFirstPointArray[1];
-        var leftLongPoint = strSecondPointArray[0];
-        var rightLongPoint = strSecondPointArray[1];
-        
-        var resultArrayFinal = new Array();
-    
-        
-       //console.log("In Function of binaryFormatLatLongSwapping ");
-       
-        //console.log("lat first point");
-        //console.log(binaryLat);
-        //console.log("long first point");
-        //console.log(binaryLong);
-        
-        //console.log("str first Lat array");
-        //console.log(strFirstPointArray);
-        //console.log("str first Long array");
-        //console.log(strSecondPointArray); 
-    
-        var leftLatAfterMutation = this.binaryToOneBitMutation(leftLatPoint); 
-        var rightLatAfterMutation = this.binaryToTwoBitMutation(rightLatPoint);
-        var leftLongAfterMutation = this.binaryToOneBitMutation(leftLongPoint);
-        var rightLongAfterMutation = this.binaryToTwoBitMutation(rightLongPoint);
-    
-        //console.log("After performing binary Mutation");
-        
-    
-        resultArrayFinal.push(leftLatAfterMutation.toString()+"."+rightLatAfterMutation.toString());
-        resultArrayFinal.push(leftLongAfterMutation.toString()+"."+rightLongAfterMutation.toString());
-    
-        return resultArrayFinal;
-    
-    }
-    
     
     binSwapping( x1:number, y1:number, x2:number, y2:number ):any {
     
         let firstPointLat = x1
         let firstPointLong = y1;
         let secondPointLat = x2;
-        let secondPointLong = y2
+        let secondPointLong = y2;
         
-        let firstPointLatBinary = this.latlongParseConvertinBinary(firstPointLat);
-        let firstPointLongBinary = this.latlongParseConvertinBinary(firstPointLong);
-        let secondPointLatBinary = this.latlongParseConvertinBinary(secondPointLat);
-        let secondPointLongBinary = this.latlongParseConvertinBinary(secondPointLong);
-        
-        let resultMutationFirstPoint = this.binaryParseApplyMutation(firstPointLatBinary,firstPointLongBinary );
-        let resultMutationSecondPoint = this.binaryParseApplyMutation(secondPointLatBinary,secondPointLongBinary);
-        
-        let firstOffsping = {x:null, y:null};
-        firstOffsping.x = parseFloat( this.binaryToDecimalParseConvertFullNo(resultMutationFirstPoint[0]) );
-        firstOffsping.y = parseFloat( this.binaryToDecimalParseConvertFullNo(resultMutationFirstPoint[1]) );
+        let firstPointLatBinary = this.latlongToBinaryConversion(firstPointLat);
+        let firstPointLongBinary = this.latlongToBinaryConversion(firstPointLong);
+        let secondPointLatBinary = this.latlongToBinaryConversion(secondPointLat);
+        let secondPointLongBinary = this.latlongToBinaryConversion(secondPointLong);
 
+        let firstOffsping = {x:null, y:null};
         let secondOffsping = {x:null, y:null};
-        secondOffsping.x = parseFloat( this.binaryToDecimalParseConvertFullNo(resultMutationSecondPoint[0]) );
-        secondOffsping.y = parseFloat( this.binaryToDecimalParseConvertFullNo(resultMutationSecondPoint[1]) );
+
+        //Getting Final Output One Bit Cross Over Result
+        /*var resultLatArrayOneBitSwapped = this.binarySwappingOneBit(firstPointLatBinary,secondPointLatBinary);
+        var resultLongArrayOneBitSwapped = this.binarySwappingOneBit(firstPointLongBinary,secondPointLongBinary);    
+      
+        firstOffsping.x = this.binaryToDecimal(resultLatArrayOneBitSwapped[0]);
+        firstOffsping.y = this.binaryToDecimal(resultLongArrayOneBitSwapped[0]);
+        secondOffsping.x = this.binaryToDecimal(resultLatArrayOneBitSwapped[1]);
+        secondOffsping.y = this.binaryToDecimal(resultLongArrayOneBitSwapped[1]);*/
+
+        //Getting Final Output Three or Four Bit First Random Cross Over Result
+        var resultLatArrayFourBitSwapped = this.binarySwappingfourBitFirstThreeBitLast(firstPointLatBinary,secondPointLatBinary);
+        var resultLongArrayFourBitSwapped = this.binarySwappingfourBitFirstThreeBitLast(firstPointLongBinary,secondPointLongBinary);     
+        
+        firstOffsping.x = this.binaryToDecimal(resultLatArrayFourBitSwapped[0]);
+        firstOffsping.y = this.binaryToDecimal(resultLongArrayFourBitSwapped[0]);
+        secondOffsping.x = this.binaryToDecimal(resultLatArrayFourBitSwapped[1]);
+        secondOffsping.y = this.binaryToDecimal(resultLongArrayFourBitSwapped[1]);
 
         return { firstOffsping, secondOffsping };
-    
+
     }
     
 }

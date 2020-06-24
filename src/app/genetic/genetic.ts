@@ -70,7 +70,7 @@ export class Genetic {
             this.discardPopulation( selected );
    
             var children:any = [];
-
+   
             children = this.crossover( selected );
 
             children = this.mutation( children );
@@ -180,9 +180,15 @@ export class Genetic {
             }
 
             //select half of number of total circles
-            if( selected.length >= population.length / 2 ) {       
+            if( population.length > 2 ) {
+                if( selected.length >= population.length / 2 ) {       
+                    break;
+                }
+            }
+            else if( selected.length == 2 ) {
                 break;
             }
+            
 
         }
         console.log("Selected:"+selected.length)
@@ -218,6 +224,9 @@ export class Genetic {
                
                 son.position = offsprings.firstOffsping;
                 daughter.position = offsprings.secondOffsping;
+
+                son.position = this.FS.get_nearest_polygon_point_to_point( son.position.x, son.position.y );
+                daughter.position = this.FS.get_nearest_polygon_point_to_point( daughter.position.x, daughter.position.y );
          
                 children.push( {son:son, daughter:daughter} )
             }
@@ -283,6 +292,10 @@ export class Genetic {
     discardPopulation( selected:any ) {
         //remove all population
         this.FS.remove_all_circles();
+        this.FS.reset_points_inCircle_to_zero();
+        this.MS.total_points_in_all_circles = 0;
+        this.MS.sendMessage( "total_points_in_all_circles");
+
         //add selected circles
         for( var i = 0; i < selected.length; i++ ) { 
             let circle:any = selected[i];
