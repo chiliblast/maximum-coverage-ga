@@ -1,6 +1,8 @@
 import { Injectable, ElementRef, OnDestroy, NgZone } from '@angular/core';
 import { Scene, WebGLRenderer, OrthographicCamera, AmbientLight, 
-  Mesh, PlaneGeometry, Group, Raycaster, MeshLambertMaterial, Vector3, Color, BufferGeometry, BufferAttribute, Points, PointsMaterial } from 'three';
+  Mesh, PlaneGeometry, Group, Raycaster, MeshLambertMaterial, Vector3, 
+  Color, BufferGeometry, BufferAttribute, Points, PointsMaterial } from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 @Injectable({ providedIn: 'root' })
 export class EngineService implements OnDestroy {
@@ -12,6 +14,7 @@ export class EngineService implements OnDestroy {
   private light: AmbientLight;
   public group: Group;
   public circleGroup: Group;
+  private orbitControls: OrbitControls;
 
   private frameId: number = null;
 
@@ -49,6 +52,13 @@ export class EngineService implements OnDestroy {
     this.light = new AmbientLight( 0x404040 );
     this.light.position.z = 10;
     this.scene.add(this.light);
+
+    this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.orbitControls.enabled = true;
+    this.orbitControls.enableRotate = false;
+    this.orbitControls.enablePan = true;
+    this.orbitControls.screenSpacePanning = true;
+    this.orbitControls.enableZoom = true;
 
     this.group = new Group();
     this.scene.add( this.group );

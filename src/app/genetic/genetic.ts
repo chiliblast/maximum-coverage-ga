@@ -82,20 +82,18 @@ export class Genetic {
                 }
             }
 
-            this.FS.set_total_points_in_all_circles();
-
             //break if population is less then total circles
-            //or total points in circles is less that total points in polygon
+            //or total points in all circles is greater than or equal to total points in polygon
             if( population.length <= this.MS.settings.circles_total 
-                /*|| this.MS.total_points_in_all_circles <= this.MS.points_in_polygon.length*/ ) {
+                || this.MS.total_points_in_all_circles >= this.MS.points_in_polygon.length ) {
                 
                 this.MS.sendMessage( "circle_popupation:"+population.length );
                 console.log("Population:"+population.length);
 
                 if( population.length <= this.MS.settings.circles_total )
                     console.log("Population size reached:"+population.length);
-                /*else if( this.MS.total_points_in_all_circles <= this.MS.points_in_polygon.length )
-                    console.log("Max points covered");  */  
+                else if( this.MS.total_points_in_all_circles >= this.MS.points_in_polygon.length )
+                    console.log("Max points covered");   
                 break;
 
             }
@@ -129,6 +127,7 @@ export class Genetic {
             //fitness will be nagative when a point is within more than 1 circle
             for( let j = 0; j < circle.userData.circlePoints.length; j++ ) {
                 var circlePoints:any = circle.userData.circlePoints[j];
+
                 if( circlePoints.inCircle == 1) {
                     circle.userData.fitness = circle.userData.fitness + 1;
                 }

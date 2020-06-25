@@ -97,7 +97,7 @@ export class FunctionService {
 
   //get points in a circle which are from points in polygon
   get_points_in_a_circle( circleID:number ):number {
-    let circle = this.engServ.circleGroup.getObjectById( circleID );
+    var circle = this.engServ.circleGroup.getObjectById( circleID );
     const position = circle.userData.position;
     const radius = circle.userData.radius;
 
@@ -115,22 +115,21 @@ export class FunctionService {
 
       //point is within circle's radius
       if( distance <= radius ) {
-        //count++;
         //inCircle will tell in how many circles this point is inside
-        points[i].inCircle = points[i].inCircle + 1; 
-        circlePoints.push( points[i] );    
-        
+        points[i].inCircle = points[i].inCircle + 1;      
+
         //if point in circle is only covered with one circle
         if( points[i].inCircle == 1 ) {
+          circlePoints.push( { x: points[i].x, y: points[i].y, inCircle: 1 } );   
           count++;
         }
 
       }
 
-    }
+    } 
 
     //circle.userData.pointsCount = count;
-    circle.userData.circlePoints = circlePoints;
+    circle.userData.circlePoints = circlePoints; 
 
     return count;
   }

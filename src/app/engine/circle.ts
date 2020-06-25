@@ -12,8 +12,6 @@ export class Circle {
     constructor( private engServ: EngineService, private MS: MessageService, private FS: FunctionService ) {
         // subscribe to component messages
         this.subscription = this.MS.getMessage().subscribe(message => {
-        
-       
     
         });
     }
