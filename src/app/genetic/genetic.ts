@@ -1,4 +1,4 @@
-import { Vector3 } from 'three';
+import { Vector3, Line, Group } from 'three';
 
 import { Subscription } from 'rxjs';
 import { EngineService } from '../engine/engine.service';
@@ -48,7 +48,9 @@ export class Genetic {
 //---------------------------------------------------------------------------
     start() {
 
-        var population:any = []; //population of circles
+        //this.FS.set_population_points();
+
+        var circleSet:any = []; //population of circles
         var points_in_polygon:any = []; //{ x : pointX, y : pointY, inCircle: 0 }
         var total_points_in_all_circles:number;
 
@@ -56,33 +58,59 @@ export class Genetic {
 
             console.log("ITERATION--------------:" + (i+1));
             
-            population = this.engServ.circleGroup.children;
+            circleSet = this.engServ.circleGroup.children;
             points_in_polygon = this.MS.points_in_polygon;
             total_points_in_all_circles = this.MS.total_points_in_all_circles;
-            console.log("Population:"+population.length)
+            console.log( "Population:"+this.FS.get_population() );
 
-            this.fitness( population );
+            this.fitness( circleSet );
 
             //selects half of total population, based on fitness, and sort then in acsending order of fitness level
-            var selected:any = this.selection( population );
+            var selected:any = this.selection( circleSet );
 
             //delete population that is not selected
             this.discardPopulation( selected );
-   
+
             var children:any = [];
    
             children = this.crossover( selected );
+             
+            //var circleSetLast:any = null;
+
+             //if selected circle set is odd in length, then add last circle set without crossover in children 
+            /* if( children.length == selected.length - 1 ) {
+                 circleSetLast = selected[ selected.length - 1 ];
+                 
+             }*/
 
             children = this.mutation( children );
 
             if( children.length > 0 ) {
-                for ( let i = 0; i < children.length; i++) {            
-                    this.FS.populate_a_circle( this.circle, children[i].son.position, children[i].son.radius );
-                    this.FS.populate_a_circle( this.circle, children[i].daughter.position, children[i].daughter.radius );
-                }
-            }
 
-            //break if population is less then total circles
+                for ( let i = 0; i < children.length; i++) {    
+                    
+                    //check for in which new circle group this new child will be added
+                    for ( let j = 0; j < this.engServ.circleGroup.children.length; j++ ) {
+                        let circleSet = this.engServ.circleGroup.children;
+
+                        if( circleSet[j].userData.circleSet == children[i].son.circleSet ) {
+
+                            this.FS.populate_a_circle( this.circle, children[i].son.position, children[i].son.radius, circleSet[j], circleSet[j].userData.color );
+
+                        }
+                        else if( circleSet[j].userData.circleSet == children[i].daughter.circleSet ) {
+                        
+                            this.FS.populate_a_circle( this.circle, children[i].daughter.position, children[i].daughter.radius, circleSet[j], circleSet[j].userData.color );
+
+                        }
+
+                    }
+
+                }
+                
+            }
+  
+    /*        //break if population is less then total circles
             //or total points in all circles is greater than or equal to total points in polygon
             if( population.length <= this.MS.settings.circles_total 
                 || this.MS.total_points_in_all_circles >= this.MS.points_in_polygon.length ) {
@@ -97,11 +125,16 @@ export class Genetic {
                 break;
 
             }
-                
-            this.MS.sendMessage( "circle_popupation:"+population.length );
-            console.log("Population:"+population.length);
-            
+      */          
+            let population = this.FS.get_population();
+            this.MS.sendMessage( "circle_popupation:"+population );
+            console.log("Population:"+population);
+
+            this.FS.set_population_points();
+          
         }
+
+        this.showResult();
 
  
     }
@@ -111,76 +144,89 @@ export class Genetic {
 
 
 
-    fitness( population:any ) {
+    fitness( circleSet:any ) {
 
         console.log("Fitness");
         
-        for( var i = 0; i < population.length; i++ ) {
-            var circle:any = population[i];
+        for( var i = 0; i < circleSet.length; i++ ) {
 
-            //more the radius, more the fitness level is
-            //circle.userData.fitness = circle.userData.radius;
+            let circle = circleSet[i].children;
 
-            //number of total points in a circle
-            circle.userData.fitness = circle.userData.circlePoints.length;
+            var fitness_total:number = 0;
 
-            //fitness will be nagative when a point is within more than 1 circle
-            for( let j = 0; j < circle.userData.circlePoints.length; j++ ) {
-                var circlePoints:any = circle.userData.circlePoints[j];
+            for( var j = 0; j < circle.length; j++ ) {
 
-                if( circlePoints.inCircle == 1) {
-                    circle.userData.fitness = circle.userData.fitness + 1;
-                }
-                else {
-                    circle.userData.fitness = circle.userData.fitness - circlePoints.inCircle;
-                }
-                
+                var object:Line = circle[j];
+
+                //more the radius, more the fitness level is
+                //object.userData.fitness = circle.userData.radius;
+
+                //number of total points in a circle
+                object.userData.fitness = object.userData.circlePoints.length;
+
+                //fitness will be nagative when a point is within more than 1 circle
+                /*for( let k = 0; k < object.userData.circlePoints.length; k++ ) {
+                    var circlePoints:any = object.userData.circlePoints[k];
+
+                    if( circlePoints.inCircle == 1) {
+                        object.userData.fitness = object.userData.fitness + 1;
+                    }
+                    else {
+                        object.userData.fitness = object.userData.fitness - circlePoints.inCircle;
+                    }
+                    
+                }*/
+
+                fitness_total = fitness_total + object.userData.fitness;
+
             }
+         
+            circleSet[i].userData.fitness = fitness_total;
+            
         }
 
     }
 
-    selection( population:any ) {
-
+    selection( circleSet:any ) {
+   
         console.log("Selection");
 
-        //selects half of total population and sorts them in acsending order of fitness level
+        //selects half of total population of circle set and sorts them in acsending order of fitness level
         var selected:any = [];
         var max = -Infinity;
-        var maxCircle:any; 
-        for( var i = 0; i < population.length; i++ ) {
-            var circle:any = population[i];
+        var maxCircleSet:any; 
+        for( var i = 0; i < circleSet.length; i++ ) {
+            var _circleSet:any = circleSet[i];
 
-            if( circle.userData.selected == true ) {
+            if( _circleSet.userData.selected == true ) {
                 //end of loop
-                if( i >= population.length - 1 ) { 
-                    maxCircle.userData.selected = true;
-                    selected.push( maxCircle );
+                if( i >= circleSet.length - 1 ) { 
+                    maxCircleSet.userData.selected = true;
+                    selected.push( maxCircleSet );
                     max = -Infinity;
                     i = -1;
-                }
-                else
-                    continue;
+                }               
+                continue;
             }
                 
             //console.log(circle.userData.fitness +" "+max)   
 
-            if( circle.userData.fitness >= max ) { 
-                max = circle.userData.fitness;   
-                maxCircle = circle;
+            if( _circleSet.userData.fitness >= max) { 
+                max = _circleSet.userData.fitness;   
+                maxCircleSet = _circleSet;
             }
   
             //end of loop
-            if( i >= population.length - 1 ) { 
-                maxCircle.userData.selected = true;
-                selected.push( maxCircle );
+            if( i >= circleSet.length - 1 ) { 
+                maxCircleSet.userData.selected = true;
+                selected.push( maxCircleSet );
                 max = -Infinity;
                 i = -1;
             }
 
             //select half of number of total circles
-            if( population.length > 2 ) {
-                if( selected.length >= population.length / 2 ) {       
+            if( circleSet.length > 2 ) {
+                if( selected.length >= circleSet.length / 2 ) {       
                     break;
                 }
             }
@@ -203,32 +249,76 @@ export class Genetic {
 
         for( var i = 0; i < selected.length; ) {
 
-            var father:any = selected[i];
-            var mother:any = selected[i+1];
+            var fatherSet:any = selected[i];
+            var motherSet:any = selected[i+1];
 
-            var son:any = { radius:null, position:{x:null,y:null}  };
-            var daughter:any = { radius:null, position:{x:null,y:null} };
+            if( fatherSet != undefined && motherSet != undefined ) {
 
-            if( father!=undefined && mother != undefined ) {
-                
-                son.radius = father.userData.radius;
-                //son.position = this.FS.get_random_point_between_two_points( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y );
-                //son.position = this.FS.get_point_adjacent_to_circle( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y, father.userData.radius, mother.userData.radius );
+                //two new circle sets will have new children after each crossover
+                var circleSet = new Group();
+                circleSet.name = "CircleSet";
+                circleSet.userData.selected = false;
+                circleSet.userData.total_points_in_all_circles = 0;
+                circleSet.userData.circleSet = i;
+                circleSet.userData.color = this.FS.get_random_color();
+                this.engServ.circleGroup.add( circleSet );
 
-                daughter.radius = father.userData.radius;
-                //daughter.position = this.FS.get_random_point_between_two_points( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y );
-                //daughter.position = this.FS.get_point_adjacent_to_circle( mother.userData.position.x, mother.userData.position.y, father.userData.position.x, father.userData.position.y, mother.userData.radius, father.userData.radius );
+                var circleSet = new Group();
+                circleSet.name = "CircleSet";
+                circleSet.userData.selected = false;
+                circleSet.userData.total_points_in_all_circles = 0;
+                circleSet.userData.circleSet = i + 1;
+                circleSet.userData.color = this.FS.get_random_color();
+                this.engServ.circleGroup.add( circleSet );
 
-                let offsprings:any = this.binary.binSwapping( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y );
+                var son:any = { radius:null, position:{x:null,y:null}  };
+                var daughter:any = { radius:null, position:{x:null,y:null} };
+
+                if( fatherSet.children.length == motherSet.children.length ) {
+
+                    for( let j = 0; j < fatherSet.children.length; j++ ) {
+                        let father = fatherSet.children[j];
+                        let mother = motherSet.children[j];
+
+                        son.radius = father.userData.radius;
+                        daughter.radius = mother.userData.radius;
+
+                        let offsprings:any = this.binary.binSwapping( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y );
                
-                son.position = offsprings.firstOffsping;
-                daughter.position = offsprings.secondOffsping;
+                        son.position = offsprings.firstOffsping;
+                        daughter.position = offsprings.secondOffsping;
 
-                son.position = this.FS.get_nearest_polygon_point_to_point( son.position.x, son.position.y );
-                daughter.position = this.FS.get_nearest_polygon_point_to_point( daughter.position.x, daughter.position.y );
-         
-                children.push( {son:son, daughter:daughter} )
+                        son.position = this.FS.get_nearest_polygon_point_to_point( son.position.x, son.position.y );
+                        daughter.position = this.FS.get_nearest_polygon_point_to_point( daughter.position.x, daughter.position.y );
+                
+                        son.circleSet = i;
+                        daughter.circleSet = i + 1;
+
+                        children.push( {son:son, daughter:daughter} );
+                    }
+
+                }
+
             }
+            //if selected circle set is odd in length, then add last circle set without crossover in children 
+            else if( fatherSet != undefined &&  motherSet == undefined ) {
+                console.log("Odd circle sets, one set left for crossover")
+               /* var circleSet = new Group();
+                circleSet.name = "CircleSet";
+                circleSet.userData.selected = false;
+                circleSet.userData.total_points_in_all_circles = 0;
+                circleSet.userData.circleSet = i;
+                circleSet.userData.color = this.FS.get_random_color();
+                this.engServ.circleGroup.add( circleSet );
+
+                for( let j = 0; j < fatherSet.children.length; j++ ) {
+                    let father = fatherSet.children[j];
+
+                    son.radius = father.userData.radius;
+                }*/
+                
+            }
+            
         
             i = i + 2;
         }
@@ -254,7 +344,7 @@ export class Genetic {
                 random = Math.round( random );
                 randomPosition = new Vector3( points_in_polygon[ random ].x, points_in_polygon[ random ].y, 0 );
 
-                //check if new random point already has a cicle in population
+                //check if new random point already has a circle in population
                 if( this.FS.is_circle_at_point( randomPosition ) == false ) {
                     children[i].son.position = randomPosition;
                 }
@@ -290,16 +380,34 @@ export class Genetic {
     
     discardPopulation( selected:any ) {
         //remove all population
-        this.FS.remove_all_circles();
+        this.FS.remove_all_circle_sets();
         this.FS.reset_points_inCircle_to_zero();
         this.MS.total_points_in_all_circles = 0;
         this.MS.sendMessage( "total_points_in_all_circles");
 
-        //add selected circles
-        for( var i = 0; i < selected.length; i++ ) { 
-            let circle:any = selected[i];
-            this.FS.populate_a_circle( this.circle, circle.userData.position, circle.userData.radius );
+        //add selected circle sets back
+        for (let i:number = 0; i < selected.length; i++) {
+            this.engServ.circleGroup.add( selected[i] );            
         }
+
+        this.MS.sendMessage( "circle_popupation:"+this.FS.get_population() );
         
     }
+
+    showResult() {
+        this.FS.remove_all_circle_sets();
+
+        var result = this.FS.result;
+        this.engServ.circleGroup.add( result );
+
+        this.FS.set_population_points();
+
+        let population = this.FS.get_population();
+        this.MS.sendMessage( "circle_popupation:"+population );
+        console.log("Population:"+population);
+
+        console.log(this.engServ.circleGroup.children)
+    }
+
+
 }

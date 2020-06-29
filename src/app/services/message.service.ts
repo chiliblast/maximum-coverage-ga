@@ -15,14 +15,15 @@ export class MessageService {
 
   public settings = {
     circles_total : 2, 
-    circles_size : 15
+    circles_size : 15,
+    sets_total : 20
   }
   
   public genetic_config = {
     "size": 0, //Population size
     "crossover": 1, //Probability of crossover
     "mutation": 0.3, //Probability of mutation
-    "iterations": 1000, //Maximum number of iterations before finishing
+    "iterations": 100, //Maximum number of iterations before finishing
   };
 
   sendMessage(message: string) {

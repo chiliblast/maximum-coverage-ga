@@ -28,7 +28,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text">Circle Size</span>
             </div>
-            <select class="custom-select" #circles_size  (change)="circles_size_changeHandler(circles_size.value)">
+            <select class="custom-select" #circles_size (change)="circles_size_changeHandler(circles_size.value)">
                 <option value="5" [selected]="circlesSize === 5">5</option>
                 <option value="10" [selected]="circlesSize === 10">10</option>
                 <option value="15" [selected]="circlesSize === 15">15</option>
@@ -36,6 +36,19 @@
                 <option value="25" [selected]="circlesSize === 25">25</option>
                 <option value="30" [selected]="circlesSize === 30">30</option>
               </select>
+        </div>
+
+        <div class="input-group input-group-sm mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Total Sets</span>
+          </div>
+          <select class="custom-select" #sets_total (change)="sets_total_changeHandler(sets_total.value)">
+              <option value="20" [selected]="setsTotal === 20">20</option>
+              <option value="40" [selected]="setsTotal === 40">40</option>
+              <option value="60" [selected]="setsTotal === 60">60</option>
+              <option value="80" [selected]="setsTotal === 80">80</option>
+              <option value="100" [selected]="setsTotal === 100">100</option>
+            </select>
         </div>
 
         <button type="button" class="btn btn-outline-primary btn-sm" 

@@ -1,4 +1,4 @@
-import { BufferGeometry, EllipseCurve, LineBasicMaterial, Line, Vector3 } from 'three';
+import { BufferGeometry, EllipseCurve, LineBasicMaterial, Line, Vector3, Group } from 'three';
 import { Subscription } from 'rxjs';
 import { EngineService } from './engine.service';
 import { MessageService } from '../services/message.service';
@@ -16,7 +16,7 @@ export class Circle {
         });
     }
 
-    drawCircle( position:Vector3, radius:number ) {
+    drawCircle( position:Vector3, radius:number, circleSet:Group ) {
         const geometry:BufferGeometry = this.circleGeometry( radius, position );
         this.circle = this.circleShape( geometry );
         this.circle.name = 'Circle';
@@ -24,9 +24,9 @@ export class Circle {
         this.circle.userData.id = this.circle.id;
         this.circle.userData.radius = radius;
         this.circle.userData.position = position;
-        this.circle.userData.selected = false;
+        //this.circle.userData.selected = false;
 
-        this.engServ.circleGroup.add(this.circle);
+        circleSet.add(this.circle);
 
         return this.circle.id;
 
@@ -54,7 +54,7 @@ export class Circle {
     circleShape( geometry:BufferGeometry ):Line {
         // material
         const material:LineBasicMaterial = new LineBasicMaterial(
-            { color: 0x49BFFE }
+            { color: 0xffffff }
         );
         
         // ellipse

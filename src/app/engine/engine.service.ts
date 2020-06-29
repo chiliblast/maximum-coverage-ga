@@ -126,8 +126,7 @@ export class EngineService implements OnDestroy {
     geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
     geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
     
-
-    const material:PointsMaterial = new PointsMaterial( { size: 2, opacity: 0.5, transparent: true, vertexColors: true } );
+    const material:PointsMaterial = new PointsMaterial( { size: 2, opacity: 0.3, transparent: true, vertexColors: true } );
 
     const points:Points = new Points( geometry, material );
     points.name = "Points";

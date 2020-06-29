@@ -12,10 +12,12 @@ export class NavbarComponent {
 
   circlesTotal:number;
   circlesSize:number;
+  setsTotal:number
 
   constructor(private engServ: EngineService, private MS: MessageService, private FS: FunctionService) {
     this.circlesTotal = this.MS.settings.circles_total;
     this.circlesSize = this.MS.settings.circles_size;
+    this.setsTotal = this.MS.settings.sets_total;
   }
 
   clear_clickHandler() {
@@ -35,7 +37,7 @@ export class NavbarComponent {
     }
 
     this.MS.sendMessage( "navbar_clear_click" );
-    this.FS.remove_all_circles();
+    this.FS.remove_all_circle_sets();
 
   }
 
@@ -45,6 +47,10 @@ export class NavbarComponent {
 
   circles_size_changeHandler( value: number ) {
     this.circlesSize = this.MS.settings.circles_size = value;
+  }
+
+  sets_total_changeHandler( value: number ) {
+    this.setsTotal = this.MS.settings.sets_total = value;
   }
 
   populate_clickHandler() {
