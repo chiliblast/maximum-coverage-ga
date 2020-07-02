@@ -196,7 +196,7 @@ export class Genetic {
                     
                 }
 
-                fitness_total = fitness_total + object.userData.fitness;
+                fitness_total = fitness_total + object.userData.fitness; 
 
             }
          
