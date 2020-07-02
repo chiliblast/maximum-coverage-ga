@@ -14,7 +14,7 @@ export class FooterComponent {
   subscription: Subscription;
 
   public mutation:number;
-  public iterations:number;
+  public generations:number;
 
   constructor(private engServ: EngineService, private MS: MessageService, private FS: FunctionService) {
     // subscribe to component messages
@@ -36,14 +36,14 @@ export class FooterComponent {
     });
 
     this.mutation = this.MS.genetic_config.mutation;
-    this.iterations = this.MS.genetic_config.iterations;
+    this.generations = this.MS.genetic_config.generations;
 
   }
 
   start_ga_clickHandler() {
     
     this.MS.genetic_config.mutation = this.mutation;
-    this.MS.genetic_config.iterations = this.iterations;
+    this.MS.genetic_config.generations = this.generations;
 
     this.MS.sendMessage( "start_ga_click" );
   }

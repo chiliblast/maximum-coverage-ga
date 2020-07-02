@@ -33,7 +33,7 @@ export class Genetic {
           "size": this.MS.genetic_config.size, //Population size
           "crossover": this.MS.genetic_config.crossover, //Probability of crossover
           "mutation": this.MS.genetic_config.mutation, //Probability of mutation
-          "iterations": this.MS.genetic_config.iterations //Maximum number of iterations before finishing
+          "generations": this.MS.genetic_config.generations //Maximum number of generations before finishing
         };
         
         if(this.config.size == 0) {
@@ -54,9 +54,14 @@ export class Genetic {
         var points_in_polygon:any = []; //{ x : pointX, y : pointY, inCircle: 0 }
         var total_points_in_all_circles:number;
 
-        for( let i = 0; i < this.config.iterations; i++ ) {
+        //if circle sets alreadt exists, make them visible
+        if( this.engServ.circleGroup.children.length > 0 ) {
+            this.FS.show_all_circle_sets();
+        }
 
-            console.log("ITERATION--------------:" + (i+1));
+        for( let i = 0; i < this.config.generations; i++ ) {
+
+            console.log("GENERATION--------------:" + (i+1));
             
             circleSet = this.engServ.circleGroup.children;
             points_in_polygon = this.MS.points_in_polygon;
@@ -177,6 +182,20 @@ export class Genetic {
                     
                 }*/
 
+                const radius:number = object.userData.radius;
+                var points_not_in_polygon = this.MS.points_not_in_polygon;
+                //fitness will be nagative when a point inside circle is not from polygon 
+                for( let k = 0; k < points_not_in_polygon.length; k++ ) {
+
+                    const distance:number = this.FS.get_distance_between_points( points_not_in_polygon[k].x, points_not_in_polygon[k].y, object.userData.position.x, object.userData.position.y );
+
+                    //point is within circle's radius
+                    if( distance <= radius ) {
+                        object.userData.fitness = object.userData.fitness - 1;
+                    }
+                    
+                }
+
                 fitness_total = fitness_total + object.userData.fitness;
 
             }
@@ -253,6 +272,8 @@ export class Genetic {
             var motherSet:any = selected[i+1];
 
             if( fatherSet != undefined && motherSet != undefined ) {
+
+                console.log("Crossing over: Set " + ( i + 1 ) + " with " + ( i + 2 ) );
 
                 //two new circle sets will have new children after each crossover
                 var circleSet = new Group();
@@ -395,18 +416,17 @@ export class Genetic {
     }
 
     showResult() {
-        this.FS.remove_all_circle_sets();
+        this.FS.hide_all_circle_sets();
 
         var result = this.FS.result;
-        this.engServ.circleGroup.add( result );
+        this.engServ.circleGroup.getObjectById( result.id ).visible = true;
 
-        this.FS.set_population_points();
 
-        let population = this.FS.get_population();
-        this.MS.sendMessage( "circle_popupation:"+population );
-        console.log("Population:"+population);
+        //let population = this.FS.get_population();
+        this.MS.sendMessage( "circle_popupation:1" );
+        console.log("Population:1");
 
-        console.log(this.engServ.circleGroup.children)
+        //console.log(this.engServ.circleGroup.children)
     }
 
 

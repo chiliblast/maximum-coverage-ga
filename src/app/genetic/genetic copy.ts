@@ -33,7 +33,7 @@ export class Genetic {
           "size": this.MS.genetic_config.size, //Population size
           "crossover": this.MS.genetic_config.crossover, //Probability of crossover
           "mutation": this.MS.genetic_config.mutation, //Probability of mutation
-          "iterations": this.MS.genetic_config.iterations //Maximum number of iterations before finishing
+          "generations": this.MS.genetic_config.generations //Maximum number of generations before finishing
         };
         
         if(this.config.size == 0) {
@@ -52,9 +52,9 @@ export class Genetic {
         var points_in_polygon:any = []; //{ x : pointX, y : pointY, inCircle: 0 }
         var total_points_in_all_circles:number;
 
-        for( let i = 0; i < this.config.iterations; i++ ) {
+        for( let i = 0; i < this.config.generations; i++ ) {
 
-            console.log("ITERATION--------------:" + (i+1));
+            console.log("GENERATION--------------:" + (i+1));
             
             population = this.engServ.circleGroup.children;
             points_in_polygon = this.MS.points_in_polygon;

@@ -53,7 +53,7 @@ export class FunctionService {
       circleSet[i].userData.total_points_in_all_circles = total_points_in_all_circles;
 
       //if points in a set is greater than previous set
-      if( total_points_in_all_circles > this.MS.total_points_in_all_circles ) {
+      if( total_points_in_all_circles >= this.MS.total_points_in_all_circles ) {
         this.MS.total_points_in_all_circles = total_points_in_all_circles;
         this.MS.sendMessage( "total_points_in_all_circles");
 
@@ -131,7 +131,7 @@ export class FunctionService {
     this.MS.sendMessage( "circle_popupation:"+this.get_population() );
     
     //this.MS.sendMessage( "circle_popupation:"+initialPopulation );
-
+    //console.log(this.engServ.circleGroup.children)
   }
 
 
@@ -272,6 +272,7 @@ export class FunctionService {
     const polygonPosition = polygon.geometry.attributes.position.array;
 
     let points_in_polygon:any = [];
+    let points_not_in_polygon:any = [];
 
     for( let i = 0; i < pointPosition.length; ) {
 
@@ -280,7 +281,7 @@ export class FunctionService {
 
       const point_in_polygon:boolean = this.is_point_in_polygon( pointX, pointY, polygonPosition );
 
-      if( point_in_polygon ) {
+      if( point_in_polygon == true ) {
 
         let pointColor = points.geometry.attributes.color.array;
 
@@ -293,12 +294,17 @@ export class FunctionService {
         points_in_polygon.push( { x : pointX, y : pointY, inCircle: 0 } );
 
       }
+      else if( point_in_polygon == false ) {
+        points_not_in_polygon.push( { x : pointX, y : pointY } );
+      }
 
       i = i + 3;
     }
 
     this.MS.points_in_polygon = points_in_polygon;
     this.MS.sendMessage('points_in_polygon');
+
+    this.MS.points_not_in_polygon = points_not_in_polygon;
 
   }
 
@@ -431,6 +437,22 @@ export class FunctionService {
     }
     //this.MS.total_points_in_all_circles = 0;
     //this.MS.sendMessage( "total_points_in_all_circles");
+  }
+
+  //hide all circles sets from Circle Group
+  hide_all_circle_sets() {
+    var circleSet = this.engServ.circleGroup.children;
+    for (let i:number = 0; i < circleSet.length; i++) {
+      circleSet[i].visible = false;
+    }
+  }
+
+  //visible all circles sets from Circle Group
+  show_all_circle_sets() {
+    var circleSet = this.engServ.circleGroup.children;
+    for (let i:number = 0; i < circleSet.length; i++) {
+      circleSet[i].visible = true;
+    }
   }
 
   //line legth or distance between 2 points

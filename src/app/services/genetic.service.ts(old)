@@ -33,7 +33,7 @@ export class GeneticService {
       "size": this.MS.genetic_config.size, //Population size
       "crossover": this.MS.genetic_config.crossover, //Probability of crossover
       "mutation": this.MS.genetic_config.mutation, //Probability of mutation
-      "iterations": this.MS.genetic_config.iterations, //Maximum number of iterations before finishing
+      "generations": this.MS.genetic_config.generations, //Maximum number of generations before finishing
       "fittestAlwaysSurvives": this.MS.genetic_config.fittestAlwaysSurvives, //Prevents losing the best fit between generations
       "maxResults": this.MS.genetic_config.maxResults, //The maximum number of best-fit results that webworkers will send per notification
       "webWorkers": this.MS.genetic_config.webWorkers, //Use Web Workers (when available)

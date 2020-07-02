@@ -10,6 +10,7 @@ export class MessageService {
   private subject = new Subject<string>();
 
   public points_in_polygon = []; //{ x : pointX, y : pointY, inCircle: 0 }
+  public points_not_in_polygon = []; //{ x : pointX, y : pointY }
 
   public total_points_in_all_circles:number = 0;
 
@@ -23,7 +24,7 @@ export class MessageService {
     "size": 0, //Population size
     "crossover": 1, //Probability of crossover
     "mutation": 0.3, //Probability of mutation
-    "iterations": 100, //Maximum number of iterations before finishing
+    "generations": 10, //Maximum number of generations before finishing
   };
 
   sendMessage(message: string) {
