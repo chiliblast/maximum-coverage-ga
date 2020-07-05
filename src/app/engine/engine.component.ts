@@ -8,11 +8,9 @@ import { Polygon } from './polygon';
 import { Circle } from './circle';
 import { Genetic } from '../genetic/genetic';
 
-
-
-
 @Component({
   selector: 'app-engine',
+  styleUrls: ['./engine.component.scss'],
   templateUrl: './engine.component.html'
 })
 export class EngineComponent implements OnInit {

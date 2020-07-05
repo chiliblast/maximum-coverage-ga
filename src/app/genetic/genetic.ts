@@ -6,6 +6,7 @@ import { MessageService } from '../services/message.service';
 import { FunctionService } from '../services/function.service';
 import { Circle } from '../engine/circle';
 import { Binary } from './binary';
+import { findReadVarNames } from '@angular/compiler/src/output/output_ast';
 
 export class Genetic {
 
@@ -48,6 +49,9 @@ export class Genetic {
 //---------------------------------------------------------------------------
     start() {
 
+        
+
+
         //this.FS.set_population_points();
 
         var circleSet:any = []; //population of circles
@@ -60,6 +64,8 @@ export class Genetic {
         }
 
         for( let i = 0; i < this.config.generations; i++ ) {
+
+            //this.FS.removeAllLables();
 
             console.log("GENERATION--------------:" + (i+1));
             
@@ -168,34 +174,7 @@ export class Genetic {
 
                 //number of total points in a circle
                 object.userData.fitness = object.userData.circlePoints.length;
-
-                //fitness will be nagative when a point is within more than 1 circle
-                /*for( let k = 0; k < object.userData.circlePoints.length; k++ ) {
-                    var circlePoints:any = object.userData.circlePoints[k];
-
-                    if( circlePoints.inCircle == 1) {
-                        object.userData.fitness = object.userData.fitness + 1;
-                    }
-                    else {
-                        object.userData.fitness = object.userData.fitness - circlePoints.inCircle;
-                    }
-                    
-                }*/
-
-                const radius:number = object.userData.radius;
-                var points_not_in_polygon = this.MS.points_not_in_polygon;
-                //fitness will be nagative when a point inside circle is not from polygon 
-                for( let k = 0; k < points_not_in_polygon.length; k++ ) {
-
-                    const distance:number = this.FS.get_distance_between_points( points_not_in_polygon[k].x, points_not_in_polygon[k].y, object.userData.position.x, object.userData.position.y );
-
-                    //point is within circle's radius
-                    if( distance <= radius ) {
-                        object.userData.fitness = object.userData.fitness - 1;
-                    }
-                    
-                }
-
+                
                 fitness_total = fitness_total + object.userData.fitness; 
 
             }
@@ -309,9 +288,17 @@ export class Genetic {
                         son.position = offsprings.firstOffsping;
                         daughter.position = offsprings.secondOffsping;
 
-                        son.position = this.FS.get_nearest_polygon_point_to_point( son.position.x, son.position.y );
-                        daughter.position = this.FS.get_nearest_polygon_point_to_point( daughter.position.x, daughter.position.y );
-                
+                        son.position = this.FS.get_exact_polygon_point_to_point( son.position.x, son.position.y );
+                        daughter.position = this.FS.get_exact_polygon_point_to_point( daughter.position.x, daughter.position.y );
+     
+
+                        if( son.position.x == null || son.position.y == null ) {
+                            son.position = this.FS.get_nearest_polygon_point_to_point( son.position.x, son.position.y );
+                        }
+                        if( daughter.position.x == null || daughter.position.y == null ) {
+                            daughter.position = this.FS.get_nearest_polygon_point_to_point( daughter.position.x, daughter.position.y );
+                        }
+
                         son.circleSet = i;
                         daughter.circleSet = i + 1;
 
@@ -417,9 +404,16 @@ export class Genetic {
 
     showResult() {
         this.FS.hide_all_circle_sets();
+        this.FS.removeAllLabels();
 
         var result = this.FS.result;
         this.engServ.circleGroup.getObjectById( result.id ).visible = true;
+
+        //show label for each circle
+        for( var i = 0; i < result.children.length; i++) {
+            var circle = result.children[i];
+            this.FS.attachLabel( circle.userData.position, circle.userData.circlePoints.length )
+        }
 
 
         //let population = this.FS.get_population();

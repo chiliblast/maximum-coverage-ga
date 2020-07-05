@@ -4,6 +4,7 @@ import { EngineService } from '../engine/engine.service';
 import { MessageService } from './message.service';
 import { Vector3, Line, Group } from 'three';
 import { Circle } from '../engine/circle';
+import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 
 @Injectable({
@@ -37,6 +38,7 @@ export class FunctionService {
 
       var circle = circleSet[i].children;
 
+      //var invalidPoints_total:number = 0;
       //loop through circles
       for( let j = 0; j < circle.length; j++ ) {
 
@@ -45,19 +47,42 @@ export class FunctionService {
         object.userData.fitness = 0;
         object.userData.circlePoints = [];
 
+        var points_in_a_circle = this.get_points_in_a_circle( object.id, circleSet[i] );
         //get_total_points_in_all_circles in a circle set
-        total_points_in_all_circles = total_points_in_all_circles + this.get_points_in_a_circle( object.id, circleSet[i] );
+        total_points_in_all_circles = total_points_in_all_circles + points_in_a_circle;
+
+        //const radius:number = object.userData.radius;
+        //var points_not_in_polygon = this.MS.points_not_in_polygon;
+        //object.userData.invalidPoints_total = 0;
+        //points outside polygon are noted in invalidPoints_total
+        /*for( let k = 0; k < points_not_in_polygon.length; k++ ) {
+
+          const distance:number = this.get_distance_between_points( points_not_in_polygon[k].x, points_not_in_polygon[k].y, object.userData.position.x, object.userData.position.y );
+
+          //point is within circle's radius
+          if( distance <= radius ) {
+              object.userData.invalidPoints_total = object.userData.invalidPoints_total + 1;
+          }
+          
+        }*/
+
+        
+        //invalidPoints_total = invalidPoints_total + object.userData.invalidPoints_total; 
       
       }
 
       circleSet[i].userData.total_points_in_all_circles = total_points_in_all_circles;
+      //circleSet[i].userData.invalidPoints_total = invalidPoints_total;
 
       //if points in a set is greater than previous set
       if( total_points_in_all_circles >= this.MS.total_points_in_all_circles ) {
+
         this.MS.total_points_in_all_circles = total_points_in_all_circles;
         this.MS.sendMessage( "total_points_in_all_circles");
 
         this.result = circleSet[i];
+      }
+      else{
       }
 
     }
@@ -66,6 +91,7 @@ export class FunctionService {
 
   populate_circles( circle:Circle ) {
 
+    this.removeAllLabels();
     this.circle = circle;
 
     this.remove_all_circle_sets();
@@ -122,6 +148,7 @@ export class FunctionService {
       if( total_points_in_all_circles > this.MS.total_points_in_all_circles ) {
         this.MS.total_points_in_all_circles = total_points_in_all_circles;
         this.MS.sendMessage( "total_points_in_all_circles");
+        this.result = circleSet;
       }
       
 
@@ -258,6 +285,8 @@ export class FunctionService {
 
     } 
 
+    this.attachLabel( position, count );
+
     //circle.userData.pointsCount = count;
     circle.userData.circlePoints = circlePoints; 
 
@@ -314,7 +343,7 @@ export class FunctionService {
     const pointDistance:number = radius1 * 2;
     const position = this.get_point_from_angle_distance( x1, y1, angle, distance );
 
-    var newPosition = this.get_nearest_polygon_point_to_point( position.x, position.y );
+    var newPosition = this.get_exact_polygon_point_to_point( position.x, position.y );
     if( newPosition.x == null && newPosition.y == null ) {
       console.log("Recursive call to get_point_adjacent_to_circle()")
       this.get_point_adjacent_to_circle( x1, y1, x2, y2, radius1, radius2 );
@@ -337,7 +366,7 @@ export class FunctionService {
       position.y = ( y2 - y1 ) * n + y1;      
     }
 
-    var newPosition = this.get_nearest_polygon_point_to_point( position.x, position.y );
+    var newPosition = this.get_exact_polygon_point_to_point( position.x, position.y );
 
     if( newPosition.x == null && newPosition.y == null ) {
       console.log("Recursive call to get_random_point_between_two_points()")
@@ -347,8 +376,8 @@ export class FunctionService {
     
   }
 
-  //get nearest point on polygon to a point
-  get_nearest_polygon_point_to_point( x:number, y:number ) {
+  //get exact point on polygon to a point
+  get_exact_polygon_point_to_point( x:number, y:number ) {
     var newPoint = {x:null,y:null};
     var points_in_polygon = this.MS.points_in_polygon;
     for( let i = 0; i < points_in_polygon.length; i++) {
@@ -363,6 +392,29 @@ export class FunctionService {
         newPoint.x = points_in_polygon[i].x;
         newPoint.y = points_in_polygon[i].y;
         break;
+      }
+
+    }
+    return newPoint;
+  }
+
+  //get nearest point on polygon to a point
+  get_nearest_polygon_point_to_point( x:number, y:number ) {
+    var newPoint = {x:null,y:null};
+    var points_in_polygon = this.MS.points_in_polygon;
+    var distance:number;
+    var min:number = Infinity;
+    for( let i = 0; i < points_in_polygon.length; i++) {
+
+      var pointX:number =points_in_polygon[i].x;
+      var pointY:number = points_in_polygon[i].y;
+
+      distance = this.get_distance_between_points( x, y, pointX, pointY );
+
+      if( distance <= min ) {
+        min = distance;
+        newPoint.x = points_in_polygon[i].x;
+        newPoint.y = points_in_polygon[i].y;
       }
 
     }
@@ -497,5 +549,29 @@ export class FunctionService {
   isOdd(n:number):boolean {
     return Math.abs(n % 2) == 1;
  }
+
+ attachLabel( position:Vector3, text:number ) {
+
+    let div = document.createElement( 'div' );
+    div.className = 'label';
+    div.textContent = text.toString();
+    let label:CSS2DObject = new CSS2DObject( div );
+    label.position.copy( position );
+    label.name = "Label"; 
+    this.engServ.labelGroup.add( label );
+
+  }
+
+  removeAllLabels() {
+    //remove all labels
+    let labelGroup = this.engServ.labelGroup; 
+    for (let i:number = 0; i < labelGroup.children.length; i++) {
+        let dimensions = labelGroup.children[i];
+        if( dimensions.name == 'Label' ) {
+            labelGroup.remove( dimensions );
+            i = -1;
+        }
+    }
+  }
 
 }

@@ -3,6 +3,7 @@ import { Scene, WebGLRenderer, OrthographicCamera, AmbientLight,
   Mesh, PlaneGeometry, Group, Raycaster, MeshLambertMaterial, Vector3, 
   Color, BufferGeometry, BufferAttribute, Points, PointsMaterial } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { CSS2DRenderer  } from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 @Injectable({ providedIn: 'root' })
 export class EngineService implements OnDestroy {
@@ -13,8 +14,10 @@ export class EngineService implements OnDestroy {
   private scene: Scene;
   private light: AmbientLight;
   public group: Group;
+  public labelGroup: Group;
   public circleGroup: Group;
   private orbitControls: OrbitControls;
+  private labelRenderer: CSS2DRenderer;
 
   private frameId: number = null;
 
@@ -38,6 +41,14 @@ export class EngineService implements OnDestroy {
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setClearColor("#000", 1);
+
+    this.labelRenderer = new CSS2DRenderer();
+    this.labelRenderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
+    this.labelRenderer.domElement.style.position = 'absolute';
+    this.labelRenderer.domElement.style.top = '0';
+    this.labelRenderer.domElement.style.pointerEvents = 'none';
+    this.canvas.parentElement.appendChild( this.labelRenderer.domElement );
+    
 
     // create the scene
     this.scene = new Scene();
@@ -65,6 +76,9 @@ export class EngineService implements OnDestroy {
 
     this.circleGroup = new Group();
     this.scene.add( this.circleGroup );
+
+    this.labelGroup = new Group();
+    this.scene.add( this.labelGroup );
 
     //background image
     this.loadTransparentBackground();
@@ -158,6 +172,7 @@ export class EngineService implements OnDestroy {
     });
 
     this.renderer.render(this.scene, this.camera);
+    this.labelRenderer.render(this.scene, this.camera);
   }
 
   public resize(): void {

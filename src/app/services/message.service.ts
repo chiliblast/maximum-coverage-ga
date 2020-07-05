@@ -24,7 +24,7 @@ export class MessageService {
     "size": 0, //Population size
     "crossover": 1, //Probability of crossover
     "mutation": 0.3, //Probability of mutation
-    "generations": 10, //Maximum number of generations before finishing
+    "generations": 1, //Maximum number of generations before finishing
   };
 
   sendMessage(message: string) {

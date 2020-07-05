@@ -24,6 +24,7 @@ export class Circle {
         this.circle.userData.id = this.circle.id;
         this.circle.userData.radius = radius;
         this.circle.userData.position = position;
+        //this.circle.userData.invalidPoints_total = 0;
         //this.circle.userData.selected = false;
 
         circleSet.add(this.circle);
