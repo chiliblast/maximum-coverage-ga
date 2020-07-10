@@ -1,4 +1,4 @@
-import { Vector3, Line, Group } from 'three';
+import { Vector3, Line, Group, MathUtils } from 'three';
 
 import { Subscription } from 'rxjs';
 import { EngineService } from '../engine/engine.service';
@@ -49,9 +49,6 @@ export class Genetic {
 //---------------------------------------------------------------------------
     start() {
 
-        
-
-
         //this.FS.set_population_points();
 
         var circleSet:any = []; //population of circles
@@ -94,7 +91,7 @@ export class Genetic {
                  
              }*/
 
-            children = this.mutation( children );
+            children = this.mutation( children ); 
 
             if( children.length > 0 ) {
 
@@ -105,22 +102,21 @@ export class Genetic {
                         let circleSet = this.engServ.circleGroup.children;
 
                         if( circleSet[j].userData.circleSet == children[i].son.circleSet ) {
-
+                            //console.log(children[i].son.position)
                             this.FS.populate_a_circle( this.circle, children[i].son.position, children[i].son.radius, circleSet[j], circleSet[j].userData.color );
-
+                        
                         }
                         else if( circleSet[j].userData.circleSet == children[i].daughter.circleSet ) {
-                        
+                            //console.log(children[i].daughter.position)
                             this.FS.populate_a_circle( this.circle, children[i].daughter.position, children[i].daughter.radius, circleSet[j], circleSet[j].userData.color );
-
+                    
                         }
-
                     }
 
                 }
                 
             }
-  
+      
     /*        //break if population is less then total circles
             //or total points in all circles is greater than or equal to total points in polygon
             if( population.length <= this.MS.settings.circles_total 
@@ -178,8 +174,9 @@ export class Genetic {
                 fitness_total = fitness_total + object.userData.fitness; 
 
             }
-         
+
             circleSet[i].userData.fitness = fitness_total;
+            //circleSet[i].userData.fitness = circleSet[i].userData.fitness - circleSet[i].userData.invalidPoints_total;
             
         }
 
@@ -243,8 +240,9 @@ export class Genetic {
 
         console.log("Crossover");
 
-        var children:any = [];
+        let children:any = [];
 
+        //loop throught selected sets
         for( var i = 0; i < selected.length; ) {
 
             var fatherSet:any = selected[i];
@@ -252,7 +250,7 @@ export class Genetic {
 
             if( fatherSet != undefined && motherSet != undefined ) {
 
-                console.log("Crossing over: Set " + ( i + 1 ) + " with " + ( i + 2 ) );
+                console.log("Crossover: Set " + ( i + 1 ) + " with " + ( i + 2 ) );
 
                 //two new circle sets will have new children after each crossover
                 var circleSet = new Group();
@@ -260,7 +258,7 @@ export class Genetic {
                 circleSet.userData.selected = false;
                 circleSet.userData.total_points_in_all_circles = 0;
                 circleSet.userData.circleSet = i;
-                circleSet.userData.color = this.FS.get_random_color();
+                circleSet.userData.color = this.FS.get_random_color(); //'0xffffff';//
                 this.engServ.circleGroup.add( circleSet );
 
                 var circleSet = new Group();
@@ -268,14 +266,15 @@ export class Genetic {
                 circleSet.userData.selected = false;
                 circleSet.userData.total_points_in_all_circles = 0;
                 circleSet.userData.circleSet = i + 1;
-                circleSet.userData.color = this.FS.get_random_color();
+                circleSet.userData.color = this.FS.get_random_color(); //'0xFF0000';//
                 this.engServ.circleGroup.add( circleSet );
 
-                var son:any = { radius:null, position:{x:null,y:null}  };
-                var daughter:any = { radius:null, position:{x:null,y:null} };
+                let son:any = { radius:null, position:{x:null,y:null}  };
+                let daughter:any = { radius:null, position:{x:null,y:null} };
 
                 if( fatherSet.children.length == motherSet.children.length ) {
 
+                    //loop through circles of selected set
                     for( let j = 0; j < fatherSet.children.length; j++ ) {
                         let father = fatherSet.children[j];
                         let mother = motherSet.children[j];
@@ -284,25 +283,28 @@ export class Genetic {
                         daughter.radius = mother.userData.radius;
 
                         let offsprings:any = this.binary.binSwapping( father.userData.position.x, father.userData.position.y, mother.userData.position.x, mother.userData.position.y );
-               
+  
                         son.position = offsprings.firstOffsping;
                         daughter.position = offsprings.secondOffsping;
-
+                    
                         son.position = this.FS.get_exact_polygon_point_to_point( son.position.x, son.position.y );
                         daughter.position = this.FS.get_exact_polygon_point_to_point( daughter.position.x, daughter.position.y );
-     
-
+              
                         if( son.position.x == null || son.position.y == null ) {
+                            console.log("Crossover Son to Nearest");
                             son.position = this.FS.get_nearest_polygon_point_to_point( son.position.x, son.position.y );
                         }
                         if( daughter.position.x == null || daughter.position.y == null ) {
+                            console.log("Crossover Daughter to Nearest");
                             daughter.position = this.FS.get_nearest_polygon_point_to_point( daughter.position.x, daughter.position.y );
                         }
-
+            
                         son.circleSet = i;
                         daughter.circleSet = i + 1;
 
-                        children.push( {son:son, daughter:daughter} );
+                        //children.push( {son:son, daughter:daughter} );
+                        children.push( JSON.parse(JSON.stringify( {son:son, daughter:daughter} )) )
+                    
                     }
 
                 }
@@ -348,13 +350,16 @@ export class Genetic {
                 let randomPosition:Vector3;
                 
                 random = Math.floor(Math.random() * Math.floor( points_in_polygon.length - 1 ));
-                random =  Math.floor(random / 3) * 3;
+                random = Math.floor(random / 3) * 3;
                 random = Math.round( random );
                 randomPosition = new Vector3( points_in_polygon[ random ].x, points_in_polygon[ random ].y, 0 );
 
                 //check if new random point already has a circle in population
                 if( this.FS.is_circle_at_point( randomPosition ) == false ) {
                     children[i].son.position = randomPosition;
+
+                    let radius:number =  MathUtils.randInt( 1, this.MS.settings.circles_size / 2 ); 
+                    children[i].son.radius = radius;
                 }
                 //mutate again
                 else {
@@ -371,6 +376,9 @@ export class Genetic {
                 //check if new random point already has a cicle in population
                 if( this.FS.is_circle_at_point( randomPosition ) == false ) {
                     children[i].daughter.position = randomPosition;
+
+                    let radius:number =  MathUtils.randInt( 1, this.MS.settings.circles_size / 2 ); 
+                    children[i].daughter.radius = radius;
                 }
                 //mutate again
                 else {
@@ -420,7 +428,8 @@ export class Genetic {
         this.MS.sendMessage( "circle_popupation:1" );
         console.log("Population:1");
 
-        //console.log(this.engServ.circleGroup.children)
+        //console.log(this.engServ.circleGroup.children);
+        console.log("Total Circles:"+this.FS.get_total_circles())
     }
 
 

@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { EngineService } from '../engine/engine.service';
 import { MessageService } from './message.service';
-import { Vector3, Line, Group } from 'three';
+import { Vector3, Line, Group, MathUtils } from 'three';
 import { Circle } from '../engine/circle';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
 
@@ -32,6 +32,7 @@ export class FunctionService {
       circleSet[i].userData.selected = false;
       circleSet[i].userData.total_points_in_all_circles = 0;
       circleSet[i].userData.fitness = 0;
+      circleSet[i].userData.circleSet = null;
           
       this.reset_points_inCircle_to_zero();
       total_points_in_all_circles = 0;
@@ -47,27 +48,11 @@ export class FunctionService {
         object.userData.fitness = 0;
         object.userData.circlePoints = [];
 
-        var points_in_a_circle = this.get_points_in_a_circle( object.id, circleSet[i] );
+        var points_in_a_circle = this.get_points_in_a_circle( object.id );
         //get_total_points_in_all_circles in a circle set
         total_points_in_all_circles = total_points_in_all_circles + points_in_a_circle;
 
-        //const radius:number = object.userData.radius;
-        //var points_not_in_polygon = this.MS.points_not_in_polygon;
-        //object.userData.invalidPoints_total = 0;
-        //points outside polygon are noted in invalidPoints_total
-        /*for( let k = 0; k < points_not_in_polygon.length; k++ ) {
-
-          const distance:number = this.get_distance_between_points( points_not_in_polygon[k].x, points_not_in_polygon[k].y, object.userData.position.x, object.userData.position.y );
-
-          //point is within circle's radius
-          if( distance <= radius ) {
-              object.userData.invalidPoints_total = object.userData.invalidPoints_total + 1;
-          }
-          
-        }*/
-
-        
-        //invalidPoints_total = invalidPoints_total + object.userData.invalidPoints_total; 
+        //invalidPoints_total = invalidPoints_total + this.get_points_not_in_a_circle( object ); 
       
       }
 
@@ -103,7 +88,7 @@ export class FunctionService {
 
     const initialPopulation:number = circles_total * sets_total;
 
-    const radius:number = this.MS.settings.circles_size / 2;
+    //const radius:number = this.MS.settings.circles_size / 2;
 
     const points_in_polygon:any = this.MS.points_in_polygon;
 
@@ -123,6 +108,7 @@ export class FunctionService {
 
       var color = this.get_random_color();
 
+      //var invalidPoints_total:number = 0;
       //loop through circles
       for( let j = 0; j < circles_total; j++ ) {
         //let random:number = MathUtils.randInt( 0, points_in_polygon.length - 1 );
@@ -132,17 +118,22 @@ export class FunctionService {
 
         const position:Vector3 = new Vector3( points_in_polygon[ random ].x, points_in_polygon[ random ].y, 0 );
 
-        //let radius:number =  MathUtils.randInt( 1, this.MS.settings.circles_size / 2 );   
+        let radius:number =  MathUtils.randInt( 1, this.MS.settings.circles_size / 2 );   
 
         const circleID:number = circle.drawCircle( position, radius, circleSet );
+        
+        //get_total_points_in_all_circles in a circle set
+        total_points_in_all_circles = total_points_in_all_circles + this.get_points_in_a_circle( circleID );
+        
         let object:any = this.engServ.circleGroup.getObjectById( circleID );
         object.material.color.setHex( color );
 
-        //get_total_points_in_all_circles in a circle set
-        total_points_in_all_circles = total_points_in_all_circles + this.get_points_in_a_circle( circleID, circleSet );
+        //invalidPoints_total = invalidPoints_total + this.get_points_not_in_a_circle( object ); 
+      
       }
 
       circleSet.userData.total_points_in_all_circles = total_points_in_all_circles;
+      //circleSet.userData.invalidPoints_total = invalidPoints_total;
 
       //if points in a set is greater than previous set
       if( total_points_in_all_circles > this.MS.total_points_in_all_circles ) {
@@ -253,7 +244,30 @@ export class FunctionService {
   }*/
 
   //get points in a circle which are from points in polygon
-  get_points_in_a_circle( circleID:number, circleSet:Group ):number {
+  get_points_not_in_a_circle( circle:any ):number {
+
+    const position = circle.userData.position;
+    const radius = circle.userData.radius;
+   
+    var points_not_in_polygon = this.MS.points_not_in_polygon;
+    circle.userData.invalidPoints_total = 0;
+    //points outside polygon are noted in invalidPoints_total
+    for( let k = 0; k < points_not_in_polygon.length; k++ ) {
+
+      const distance:number = this.get_distance_between_points( points_not_in_polygon[k].x, points_not_in_polygon[k].y, position.x, position.y );
+
+      //point is within circle's radius
+      if( distance <= radius ) {
+        circle.userData.invalidPoints_total = circle.userData.invalidPoints_total + 1;
+      }
+      
+    }
+    return circle.userData.invalidPoints_total;
+  }
+
+  //get points in a circle which are from points in polygon
+  get_points_in_a_circle( circleID:number ):number {
+
     var circle = this.engServ.circleGroup.getObjectById( circleID );
     const position = circle.userData.position;
     const radius = circle.userData.radius;
@@ -400,25 +414,27 @@ export class FunctionService {
 
   //get nearest point on polygon to a point
   get_nearest_polygon_point_to_point( x:number, y:number ) {
-    var newPoint = {x:null,y:null};
+    var newPoint = [];//{x:null,y:null};
     var points_in_polygon = this.MS.points_in_polygon;
     var distance:number;
     var min:number = Infinity;
     for( let i = 0; i < points_in_polygon.length; i++) {
 
-      var pointX:number =points_in_polygon[i].x;
+      var pointX:number = points_in_polygon[i].x;
       var pointY:number = points_in_polygon[i].y;
 
       distance = this.get_distance_between_points( x, y, pointX, pointY );
 
-      if( distance <= min ) {
+      if( distance < min ) {
         min = distance;
-        newPoint.x = points_in_polygon[i].x;
-        newPoint.y = points_in_polygon[i].y;
+        //newPoint.x = points_in_polygon[i].x;
+        //newPoint.y = points_in_polygon[i].y;
+        newPoint = [];
+        newPoint.push( JSON.parse(JSON.stringify( points_in_polygon[i] )) )
       }
 
     }
-    return newPoint;
+    return newPoint[0];
   }
 
   public reset_points_inCircle_to_zero() {
@@ -534,7 +550,7 @@ export class FunctionService {
     return parseInt( randomColor );
   }
 
-  //count all circles in all sets
+  //count all circle groups
   get_population():number {
     var circleSet = this.engServ.circleGroup.children;
     return circleSet.length;
@@ -544,6 +560,17 @@ export class FunctionService {
       count = count + circle.length;
     }
     return count;*/
+  }
+
+   //count all circles in all sets
+   get_total_circles():number {
+    var circleSet = this.engServ.circleGroup.children;
+    var count=0;
+    for(var i = 0; i < circleSet.length; i++) {
+      let circle = circleSet[i].children;
+      count = count + circle.length;
+    }
+    return count;
   }
 
   isOdd(n:number):boolean {
