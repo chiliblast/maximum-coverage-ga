@@ -39,7 +39,7 @@ export class FunctionService {
 
       var circle = circleSet[i].children;
 
-      //var invalidPoints_total:number = 0;
+      var invalidPoints_total:number = 0;
       //loop through circles
       for( let j = 0; j < circle.length; j++ ) {
 
@@ -52,12 +52,12 @@ export class FunctionService {
         //get_total_points_in_all_circles in a circle set
         total_points_in_all_circles = total_points_in_all_circles + points_in_a_circle;
 
-        //invalidPoints_total = invalidPoints_total + this.get_points_not_in_a_circle( object ); 
+        invalidPoints_total = invalidPoints_total + this.get_points_not_in_a_circle( object ); 
       
       }
 
       circleSet[i].userData.total_points_in_all_circles = total_points_in_all_circles;
-      //circleSet[i].userData.invalidPoints_total = invalidPoints_total;
+      circleSet[i].userData.invalidPoints_total = invalidPoints_total;
 
       //if points in a set is greater than previous set
       if( total_points_in_all_circles >= this.MS.total_points_in_all_circles ) {
@@ -83,7 +83,9 @@ export class FunctionService {
     this.reset_points_inCircle_to_zero();
     
 
-    const circles_total:number = this.MS.settings.circles_total;
+    let circles_total:number = this.MS.settings.circles_total;
+    //let circles_total:number = this.get_circles_total_needed();
+
     const sets_total:number = this.MS.settings.sets_total;
 
     const initialPopulation:number = circles_total * sets_total;
@@ -91,6 +93,8 @@ export class FunctionService {
     //const radius:number = this.MS.settings.circles_size / 2;
 
     const points_in_polygon:any = this.MS.points_in_polygon;
+
+
 
     let total_points_in_all_circles:number;
 
@@ -108,7 +112,7 @@ export class FunctionService {
 
       var color = this.get_random_color();
 
-      //var invalidPoints_total:number = 0;
+      var invalidPoints_total:number = 0;
       //loop through circles
       for( let j = 0; j < circles_total; j++ ) {
         //let random:number = MathUtils.randInt( 0, points_in_polygon.length - 1 );
@@ -128,12 +132,12 @@ export class FunctionService {
         let object:any = this.engServ.circleGroup.getObjectById( circleID );
         object.material.color.setHex( color );
 
-        //invalidPoints_total = invalidPoints_total + this.get_points_not_in_a_circle( object ); 
+        invalidPoints_total = invalidPoints_total + this.get_points_not_in_a_circle( object ); 
       
       }
 
       circleSet.userData.total_points_in_all_circles = total_points_in_all_circles;
-      //circleSet.userData.invalidPoints_total = invalidPoints_total;
+      circleSet.userData.invalidPoints_total = invalidPoints_total;
 
       //if points in a set is greater than previous set
       if( total_points_in_all_circles > this.MS.total_points_in_all_circles ) {
@@ -150,6 +154,50 @@ export class FunctionService {
     
     //this.MS.sendMessage( "circle_popupation:"+initialPopulation );
     //console.log(this.engServ.circleGroup.children)
+  }
+
+  get_circles_total_needed():number {
+    const points_in_polygon_total:number = this.MS.points_in_polygon.length;
+    var count:number = 0;
+    for( let i = 0; i < points_in_polygon_total; ) {
+
+      count++;
+
+      i = i + 1609; //circle size=30, radius=15
+
+      if( i >= points_in_polygon_total ) {
+        i = i - 1609;
+        i = i + 1117; //circle size=25, radius=2.5
+
+        if( i >= points_in_polygon_total ) {
+          i = i - 1117;
+          i = i + 717; //circle size=20, radius=10
+
+          if( i >= points_in_polygon_total ) {
+            i = i - 717;
+            i = i + 405; //circle size=15, radius=7.5
+
+            if( i >= points_in_polygon_total ) {
+              i = i - 405;
+              i = i + 177; //circle size=10, radius=5
+
+              if( i >= points_in_polygon_total ) {
+                i = i - 177;
+                i = i + 45; //circle size=5, radius=2.5
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+      
+    }
+    console.log("Required Total Circles:"+count);
+    return count;
+
   }
 
 

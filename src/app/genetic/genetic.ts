@@ -176,7 +176,7 @@ export class Genetic {
             }
 
             circleSet[i].userData.fitness = fitness_total;
-            //circleSet[i].userData.fitness = circleSet[i].userData.fitness - circleSet[i].userData.invalidPoints_total;
+            circleSet[i].userData.fitness = circleSet[i].userData.fitness - circleSet[i].userData.invalidPoints_total;
             
         }
 
@@ -418,10 +418,10 @@ export class Genetic {
         this.engServ.circleGroup.getObjectById( result.id ).visible = true;
 
         //show label for each circle
-        for( var i = 0; i < result.children.length; i++) {
+        /*for( var i = 0; i < result.children.length; i++) {
             var circle = result.children[i];
             this.FS.attachLabel( circle.userData.position, circle.userData.circlePoints.length )
-        }
+        }*/
 
 
         //let population = this.FS.get_population();
