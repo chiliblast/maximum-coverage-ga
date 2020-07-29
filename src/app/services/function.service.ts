@@ -39,7 +39,7 @@ export class FunctionService {
 
       var circle = circleSet[i].children;
 
-      var invalidPoints_total:number = 0;
+      //var invalidPoints_total:number = 0;
       //loop through circles
       for( let j = 0; j < circle.length; j++ ) {
 
@@ -52,12 +52,12 @@ export class FunctionService {
         //get_total_points_in_all_circles in a circle set
         total_points_in_all_circles = total_points_in_all_circles + points_in_a_circle;
 
-        invalidPoints_total = invalidPoints_total + this.get_points_not_in_a_circle( object ); 
+        //invalidPoints_total = invalidPoints_total + this.get_points_not_in_a_circle( object ); 
       
       }
 
       circleSet[i].userData.total_points_in_all_circles = total_points_in_all_circles;
-      circleSet[i].userData.invalidPoints_total = invalidPoints_total;
+      //circleSet[i].userData.invalidPoints_total = invalidPoints_total;
 
       //if points in a set is greater than previous set
       if( total_points_in_all_circles >= this.MS.total_points_in_all_circles ) {
@@ -112,7 +112,7 @@ export class FunctionService {
 
       var color = this.get_random_color();
 
-      var invalidPoints_total:number = 0;
+      //var invalidPoints_total:number = 0;
       //loop through circles
       for( let j = 0; j < circles_total; j++ ) {
         //let random:number = MathUtils.randInt( 0, points_in_polygon.length - 1 );
@@ -132,12 +132,12 @@ export class FunctionService {
         let object:any = this.engServ.circleGroup.getObjectById( circleID );
         object.material.color.setHex( color );
 
-        invalidPoints_total = invalidPoints_total + this.get_points_not_in_a_circle( object ); 
+        //invalidPoints_total = invalidPoints_total + this.get_points_not_in_a_circle( object ); 
       
       }
 
       circleSet.userData.total_points_in_all_circles = total_points_in_all_circles;
-      circleSet.userData.invalidPoints_total = invalidPoints_total;
+      //circleSet.userData.invalidPoints_total = invalidPoints_total;
 
       //if points in a set is greater than previous set
       if( total_points_in_all_circles > this.MS.total_points_in_all_circles ) {
@@ -292,7 +292,7 @@ export class FunctionService {
   }*/
 
   //get points in a circle which are from points in polygon
-  get_points_not_in_a_circle( circle:any ):number {
+  /*get_points_not_in_a_circle( circle:any ):number {
 
     const position = circle.userData.position;
     const radius = circle.userData.radius;
@@ -311,7 +311,7 @@ export class FunctionService {
       
     }
     return circle.userData.invalidPoints_total;
-  }
+  }*/
 
   //get points in a circle which are from points in polygon
   get_points_in_a_circle( circleID:number ):number {

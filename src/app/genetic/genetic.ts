@@ -176,7 +176,7 @@ export class Genetic {
             }
 
             circleSet[i].userData.fitness = fitness_total;
-            circleSet[i].userData.fitness = circleSet[i].userData.fitness - circleSet[i].userData.invalidPoints_total;
+            //circleSet[i].userData.fitness = circleSet[i].userData.fitness - circleSet[i].userData.invalidPoints_total;
             
         }
 
